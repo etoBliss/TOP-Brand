@@ -4,6 +4,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import curator from '../assets/Frame 5.svg';
 
 // EmailJS Configuration (Replace with your keys)
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -27,7 +28,11 @@ import {
   Plus,
   Pencil,
   Reply,
-  X
+  X,
+  TrendingUp,
+  Database,
+  Menu,
+  Activity
 } from 'lucide-react';
 
 const Admin = () => {
@@ -41,8 +46,18 @@ const Admin = () => {
   const [showInquiryReply, setShowInquiryReply] = useState(null);
   const [showBlogForm, setShowBlogForm] = useState(null);
   const [showEventForm, setShowEventForm] = useState(null);
+  const [confirmModal, setConfirmModal] = useState(null); // { title: string, message: string, onConfirm: () => void, confirmText: string }
+  const [systemAlert, setSystemAlert] = useState(null); // { title: string, message: string }
   
   const navigate = useNavigate();
+
+  // Auto-close modals on tab change
+  useEffect(() => {
+    setShowInquiryReply(null);
+    setShowBlogForm(null);
+    setShowEventForm(null);
+    setConfirmModal(null);
+  }, [activeTab]);
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -77,10 +92,16 @@ const Admin = () => {
   const handleLogout = () => signOut(auth);
 
   // Inquiry Logic
-  const deleteInquiry = async (id) => {
-    if (window.confirm('Delete this transmission permanently?')) {
-      await deleteDoc(doc(db, 'inquiries', id));
-    }
+  const deleteInquiry = (id) => {
+    setConfirmModal({
+      title: 'Exterminate Transmission',
+      message: 'Are you certain you wish to purge this artifact from the system memory? This action is irreversible.',
+      confirmText: 'Confirm Purge',
+      onConfirm: async () => {
+        await deleteDoc(doc(db, 'inquiries', id));
+        setConfirmModal(null);
+      }
+    });
   };
 
   const markResolved = async (id, current) => {
@@ -108,12 +129,18 @@ const Admin = () => {
         EMAILJS_PUBLIC_KEY
       );
       if (result.status === 200) {
-        console.log('Reply transmitted to client successfully!');
+        setSystemAlert({
+          title: 'Transmission Success',
+          message: 'The vision has been successfully synchronized and transmitted to the client.'
+        });
       }
     } catch (err) {
       console.error('Email Transmission Failed:', err);
       const errorMsg = err?.text || err?.message || 'Unknown error';
-      alert('The vision was recorded in the archive, but the email transmission failed: ' + errorMsg);
+      setSystemAlert({
+        title: 'Network Dissonance',
+        message: 'The insight was archived locally, but the transmission failed: ' + errorMsg
+      });
     } finally {
       setShowInquiryReply(null);
     }
@@ -129,10 +156,16 @@ const Admin = () => {
     setShowBlogForm(null);
   };
 
-  const deleteBlog = async (id) => {
-    if (window.confirm('Exterminate this insight?')) {
-      await deleteDoc(doc(db, 'blogs', id));
-    }
+  const deleteBlog = (id) => {
+    setConfirmModal({
+      title: 'Erase Insight',
+      message: 'This curated artifact will be permanently removed from the public archive. Proceed with caution.',
+      confirmText: 'Erase Permanently',
+      onConfirm: async () => {
+        await deleteDoc(doc(db, 'blogs', id));
+        setConfirmModal(null);
+      }
+    });
   };
 
   // Event Logic
@@ -145,10 +178,16 @@ const Admin = () => {
     setShowEventForm(null);
   };
 
-  const deleteEvent = async (id) => {
-    if (window.confirm('Cancel this engagement?')) {
-      await deleteDoc(doc(db, 'events', id));
-    }
+  const deleteEvent = (id) => {
+    setConfirmModal({
+      title: 'Cancel Engagement',
+      message: 'Removing this forum will synchronize across all curator terminals. All registration links will be deactivated.',
+      confirmText: 'Confirm Deactivation',
+      onConfirm: async () => {
+        await deleteDoc(doc(db, 'events', id));
+        setConfirmModal(null);
+      }
+    });
   };
 
   if (!user) return null;
@@ -157,11 +196,11 @@ const Admin = () => {
     <div className="min-h-screen bg-background flex text-white relative">
       <div className="fixed inset-0 grain-overlay z-[0] pointer-events-none opacity-[0.03]"></div>
       
-      {/* Sidebar Shell */}
-      <aside className="w-64 border-r border-stone-800 bg-stone-900/50 flex flex-col fixed inset-y-0 z-20">
+      {/* Desktop Sidebar Shell */}
+      <aside className="hidden md:flex w-64 border-r border-stone-800 bg-stone-900/50 flex-col fixed inset-y-0 z-20">
         <div className="p-8 border-b border-stone-800">
           <div className="text-xl font-bold text-white mb-1 font-headline">TOP Admin</div>
-          <div className="font-body font-extralight uppercase tracking-[0.1em] text-[10px] text-stone-500 italic">Architectural Curator</div>
+          <div className="font-body font-extralight uppercase tracking-[0.1em] text-[10px] text-stone-500 italic">Curator Console</div>
         </div>
 
         <nav className="flex-grow py-8 bg-stone-950/20">
@@ -221,170 +260,293 @@ const Admin = () => {
         </div>
       </aside>
 
+      {/* Mobile Top Navigation */}
+      <header className="fixed top-0 left-0 w-full z-40 bg-stone-950/60 backdrop-blur-xl border-b border-stone-800/30 md:hidden">
+        <div className="flex justify-between items-center px-6 py-5">
+          <div className="flex items-center gap-3">
+            <Menu className="text-secondary w-5 h-5" />
+            <span className="text-xl font-black tracking-tighter text-white font-headline">TOP</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <div className="w-8 h-8 bg-stone-800 flex items-center justify-center overflow-hidden ring-1 ring-white/10">
+              <img alt="Profile" className="w-full h-full object-cover" src={curator} />
+            </div>
+          </div>
+        </div>
+      </header>
+      
       {/* Main Content Area */}
-      <main className="flex-grow ml-64 p-12 relative z-10">
-        <header className="flex justify-between items-center mb-12">
+      <main className="flex-grow md:ml-64 p-6 md:p-12 relative z-10 pt-28 md:pt-12 pb-32 md:pb-12">
+        <header className="flex justify-between items-end mb-12">
           <div>
-            <h1 className="font-headline text-4xl text-white mb-2">
-              {activeTab === 'dashboard' ? 'System Overview' : 'Vision Transmissions'}
+            <p className="font-body font-extralight uppercase tracking-[0.2em] text-[10px] text-primary mb-2 md:mb-4">Internal Management</p>
+            <h1 className="font-headline text-3xl md:text-5xl font-light tracking-tight text-white mb-2 md:mb-4">
+              {activeTab === 'dashboard' ? 'Overview' : activeTab.charAt(0).toUpperCase() + activeTab.slice(1)}
             </h1>
-            <p className="font-body text-stone-500 text-sm italic">
-              {activeTab === 'dashboard' ? 'Curating the digital landscape' : 'Managing inbound inquiries and bookings'}
-            </p>
+            <div className="h-0.5 w-12 bg-primary mt-2"></div>
           </div>
           <Link 
             to="/" 
-            className="flex items-center gap-2 text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all"
+            className="hidden md:flex items-center gap-2 text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all"
           >
-            View Live Site <ExternalLink className="w-3 h-3" />
+            Terminal <ExternalLink className="w-3 h-3" />
           </Link>
         </header>
 
         {activeTab === 'dashboard' && (
-          <>
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-              <div className="bg-stone-950 p-8 border border-stone-800 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <FileText className="w-12 h-12" />
+          <div className="space-y-12 animate-in fade-in duration-700">
+            {/* Key Metrics: 2x2 on mobile */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
+              <div className="bg-stone-900/40 p-5 md:p-8 flex flex-col justify-between h-32 md:h-40 border-l-2 border-primary group hover:bg-stone-900/60 transition-colors">
+                <span className="font-label font-extralight uppercase tracking-widest text-[9px] text-stone-500 group-hover:text-stone-400 transition-colors">Impressions</span>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-4xl font-light text-white tracking-tighter">142.8k</span>
+                  <span className="text-[10px] text-primary font-medium mt-1">+12% vs week</span>
                 </div>
-                <h4 className="font-label uppercase text-[10px] text-stone-500 tracking-widest mb-4">Total Insights</h4>
-                <p className="font-headline text-5xl text-white">{blogs.length}</p>
               </div>
-              <div className="bg-stone-950 p-8 border border-stone-800 relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <Calendar className="w-12 h-12" />
+              <div className="bg-stone-900/40 p-5 md:p-8 flex flex-col justify-between h-32 md:h-40 group hover:bg-stone-900/60 transition-colors">
+                <span className="font-label font-extralight uppercase tracking-widest text-[9px] text-stone-500 group-hover:text-stone-400 transition-colors">Curations</span>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-4xl font-light text-white tracking-tighter">{blogs.length}</span>
+                  <span className="text-[10px] text-stone-500 font-medium mt-1">Active Portfolio</span>
                 </div>
-                <h4 className="font-label uppercase text-[10px] text-stone-500 tracking-widest mb-4">Global Forums</h4>
-                <p className="font-headline text-5xl text-secondary">{events.length}</p>
               </div>
-              <div className="bg-stone-950 p-8 border border-stone-800 relative overflow-hidden group">
-                 <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                  <MessageSquare className="w-12 h-12" />
+              <div className="bg-stone-900/40 p-5 md:p-8 flex flex-col justify-between h-32 md:h-40 group hover:bg-stone-900/60 transition-colors">
+                <span className="font-label font-extralight uppercase tracking-widest text-[9px] text-stone-500 group-hover:text-stone-400 transition-colors">Forums</span>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-4xl font-light text-white tracking-tighter">{events.length}</span>
+                  <span className="text-[10px] text-secondary font-medium mt-1">Global Reach</span>
                 </div>
-                <h4 className="font-label uppercase text-[10px] text-stone-500 tracking-widest mb-4">Transmission Waitlist</h4>
-                <p className="font-headline text-5xl text-primary">{inquiries.filter(i => !i.resolved).length}</p>
+              </div>
+              <div className="bg-stone-900/40 p-5 md:p-8 flex flex-col justify-between h-32 md:h-40 border-r-2 border-stone-800 group hover:bg-stone-900/60 transition-colors">
+                <span className="font-label font-extralight uppercase tracking-widest text-[9px] text-stone-500 group-hover:text-stone-400 transition-colors">Waitlist</span>
+                <div className="flex flex-col">
+                  <span className="text-2xl md:text-4xl font-light text-white tracking-tighter">{inquiries.filter(i => !i.resolved).length}</span>
+                  <span className="text-[10px] text-primary font-medium mt-1">Priority Tasks</span>
+                </div>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="bg-stone-950 p-10 border border-stone-800">
-                <h3 className="font-headline text-2xl text-white mb-6 italic text-stone-400">Curatorial Commands</h3>
-                <div className="space-y-4">
-                  <button onClick={() => setActiveTab('blogs')} className="w-full flex items-center justify-between p-4 bg-stone-900/50 hover:bg-stone-800 transition-all group">
-                    <span className="font-label uppercase tracking-widest text-[10px] text-stone-300">Draft New Insight</span>
-                    <Plus className="w-4 h-4 text-stone-600 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button onClick={() => setActiveTab('inquiries')} className="w-full flex items-center justify-between p-4 bg-stone-900/50 hover:bg-stone-800 transition-all group">
-                    <span className="font-label uppercase tracking-widest text-[10px] text-stone-300">Review Transmissions</span>
-                    <ChevronRight className="w-4 h-4 text-stone-600 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                </div>
+            {/* Primary CTA */}
+            <div className="flex flex-col md:flex-row gap-4 mb-16">
+               <button 
+                onClick={() => setActiveTab('blogs')}
+                className="flex-1 py-5 bg-primary-container text-white font-label font-medium uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:bg-red-700"
+              >
+                <Plus className="w-4 h-4" /> New Insight entry
+              </button>
+              <button 
+                onClick={() => setActiveTab('inquiries')}
+                className="flex-1 py-5 bg-stone-900 border border-stone-800 text-stone-400 font-label font-medium uppercase tracking-[0.15em] text-[10px] flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:border-stone-600 hover:text-white"
+              >
+                <MessageSquare className="w-4 h-4" /> Review waitlist
+              </button>
+            </div>
+
+            {/* Recent Artifacts Gallery */}
+            <section className="mb-20">
+              <div className="flex justify-between items-end mb-8 border-b border-stone-800 pb-4">
+                <h2 className="font-headline text-2xl font-light italic text-white/90">Recent Artifacts</h2>
+                <button onClick={() => setActiveTab('blogs')} className="font-label font-extralight uppercase tracking-[0.1em] text-[10px] text-stone-500 hover:text-primary transition-colors">View Archives</button>
               </div>
               
-              <div className="bg-stone-950 p-10 border-l-4 border-primary border-t border-r border-b border-stone-800">
-                <h3 className="font-headline text-2xl text-white mb-4">Architecture of Data</h3>
-                <p className="font-body text-stone-400 text-sm mb-8 leading-relaxed italic">
-                  Systems Online. Your curator console is bridged with Firestore. All transmissions and insights are synchronized across the global network.
-                </p>
-                <div className="flex gap-4">
-                  <div className="flex items-center gap-2 text-[10px] font-label uppercase text-green-500">
-                    <CheckCircle2 className="w-3 h-3" /> Synchronization Active
+              {blogs.length === 0 ? (
+                <div className="py-20 text-center border border-dashed border-stone-800 bg-stone-900/20">
+                   <Database className="w-8 h-8 text-stone-800 mx-auto mb-4" />
+                   <p className="font-body text-stone-600 text-sm italic">The archive is waiting for your curated vision.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                  {blogs.slice(0, 3).map((blog, idx) => (
+                    <div key={blog.id} className="group cursor-pointer" onClick={() => setShowBlogForm(blog)}>
+                      <div className="relative w-full aspect-[4/5] bg-stone-900 mb-6 overflow-hidden">
+                        <div className="absolute inset-0 bg-stone-950 opacity-40 group-hover:opacity-20 transition-opacity z-10"></div>
+                        <div className="w-full h-full flex items-center justify-center text-stone-800 font-headline text-2xl italic select-none">
+                            {blog.title.charAt(0)}
+                        </div>
+                        <div className="absolute top-6 left-6 bg-stone-950/90 backdrop-blur-md px-3 py-1.5 z-20 border border-white/5">
+                          <span className="text-[9px] font-label tracking-[0.2em] text-white uppercase">{blog.category}</span>
+                        </div>
+                        <div className="absolute bottom-6 left-6 z-20 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <div className="p-3 bg-primary rounded-full shadow-2xl">
+                              <Plus className="w-4 h-4 text-white" />
+                           </div>
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <h3 className="font-headline text-xl font-light text-white leading-tight group-hover:text-primary transition-colors line-clamp-2">{blog.title}</h3>
+                        <div className="flex items-center gap-3 text-[10px] text-stone-500 font-label uppercase tracking-widest">
+                          <span className="flex items-center gap-1.5"><Clock className="w-3 h-3" /> Modified {idx === 0 ? 'Recently' : 'Archives'}</span>
+                          <span className="w-1 h-1 bg-stone-800 rounded-full"></span>
+                          <span className="text-secondary">{idx === 0 ? 'Public' : 'Stored'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Performance Bento Segment */}
+            <section className="bg-stone-900/20 border border-stone-800 p-8 md:p-12 mb-12">
+              <div className="flex flex-col lg:flex-row justify-between gap-12">
+                <div className="lg:w-1/3">
+                  <h3 className="font-label font-extralight uppercase tracking-[0.2em] text-[10px] text-stone-500 mb-4">Performance Insights</h3>
+                  <p className="font-body text-stone-400 text-sm italic leading-relaxed">
+                    Analyzing the resonant frequencies of your curatorial data across the global architectural network.
+                  </p>
+                </div>
+                <div className="lg:w-2/3 flex flex-col gap-8">
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-end">
+                      <span className="font-label text-stone-500 uppercase tracking-widest text-[10px]">Global Resonance</span>
+                      <span className="font-headline text-2xl text-white tracking-tighter">84%</span>
+                    </div>
+                    <div className="w-full h-px bg-stone-800 relative">
+                      <div className="absolute left-0 top-0 h-full w-[84%] bg-primary shadow-[0_0_10px_rgba(255,0,0,0.5)]"></div>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-8">
+                    <div className="p-6 bg-stone-900/40 border border-stone-800 group hover:border-stone-600 transition-colors">
+                       <TrendingUp className="w-5 h-5 text-secondary mb-4" />
+                       <span className="block text-xl font-light text-white tracking-tighter mb-1">12.4m</span>
+                       <span className="text-[9px] text-stone-500 uppercase tracking-widest leading-none">Total Seconds Viewtime</span>
+                    </div>
+                    <div className="p-6 bg-stone-900/40 border border-stone-800 group hover:border-stone-600 transition-colors">
+                       <Activity className="w-5 h-5 text-primary mb-4" />
+                       <span className="block text-xl font-light text-white tracking-tighter mb-1">98.2%</span>
+                       <span className="text-[9px] text-stone-500 uppercase tracking-widest leading-none">System Stability Index</span>
+                    </div>
                   </div>
                 </div>
               </div>
+            </section>
+
+             {/* Support Actions */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="p-8 bg-stone-900 border border-stone-800 flex items-center justify-between group hover:bg-stone-800/40 transition-colors">
+                <div className="flex items-center gap-6">
+                  <div className="p-3 bg-stone-950 border border-stone-800 group-hover:border-primary transition-colors">
+                    <Activity className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <h4 className="text-white text-[11px] font-bold uppercase tracking-widest">System Health</h4>
+                    <p className="text-[10px] text-stone-500 font-light mt-1 italic">All curator services operational</p>
+                  </div>
+                </div>
+                <div className="w-2 h-2 bg-green-500/50 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+              </div>
+              <div className="p-8 bg-stone-900 border border-stone-800 flex items-center justify-between group hover:bg-stone-800/40 transition-colors">
+                <div className="flex items-center gap-6">
+                  <div className="p-3 bg-stone-950 border border-stone-800 group-hover:border-stone-400 transition-colors">
+                    <Database className="w-4 h-4 text-stone-500" />
+                  </div>
+                  <div>
+                    <h4 className="text-white text-[11px] font-bold uppercase tracking-widest">Archive Backup</h4>
+                    <p className="text-[10px] text-stone-500 font-light mt-1 italic">Last sync: 2 hours ago</p>
+                  </div>
+                </div>
+                <CheckCircle2 className="w-4 h-4 text-stone-700 group-hover:text-stone-400 transition-colors" />
+              </div>
             </div>
-          </>
+          </div>
         )}
 
         {activeTab === 'inquiries' && (
-          <div className="space-y-6 max-w-5xl">
+          <div className="space-y-6 max-w-5xl animate-in slide-in-from-bottom-4 duration-500">
             {inquiries.length === 0 ? (
-              <div className="bg-stone-950 p-24 text-center border border-dashed border-stone-800">
-                <MessageSquare className="w-12 h-12 text-stone-800 mx-auto mb-6" />
-                <p className="font-body text-stone-500 italic">The waitlist is silent.</p>
+              <div className="bg-stone-950/20 p-24 text-center border border-dashed border-stone-800">
+                <MessageSquare className="w-10 h-10 text-stone-800 mx-auto mb-6" />
+                <p className="font-body text-stone-600 italic">The waitlist is silent.</p>
               </div>
             ) : (
-              inquiries.map((inquiry) => (
-                <div key={inquiry.id} className={`bg-stone-950 border border-stone-800 p-8 transition-all group hover:bg-stone-900/40 relative ${inquiry.resolved ? 'opacity-40 grayscale' : 'border-l-primary-container border-l-4'}`}>
-                  <div className="flex flex-col md:flex-row justify-between gap-8">
-                    <div className="flex-grow space-y-6">
-                      <div className="flex flex-wrap items-center gap-6">
-                        <div className="flex items-center gap-2 text-stone-400">
-                          <User className="w-3 h-3" />
-                          <span className="font-label uppercase tracking-widest text-[10px]">{inquiry.name}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-stone-400">
-                          <Mail className="w-3 h-3" />
-                          <span className="font-label uppercase tracking-widest text-[10px]">{inquiry.email}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-secondary">
-                          <Briefcase className="w-3 h-3" />
-                          <span className="font-label uppercase tracking-widest text-[10px]">{inquiry.service}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-stone-600">
-                          <Clock className="w-3 h-3" />
-                          <span className="font-label uppercase tracking-widest text-[10px]">
-                            {inquiry.timestamp?.toDate().toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                      <p className="font-body text-lg text-stone-300 italic">"{inquiry.message}"</p>
-                      {inquiry.reply && (
-                        <div className="mt-6 p-6 bg-stone-900/50 border-l border-secondary">
-                          <div className="flex items-center gap-2 text-secondary text-[10px] font-label uppercase tracking-widest mb-2">
-                             <Reply className="w-3 h-3" /> Response Transmitted
+              <div className="grid grid-cols-1 gap-6">
+                {inquiries.map((inquiry) => (
+                  <div key={inquiry.id} className={`bg-stone-950 border border-stone-800 p-8 transition-all group hover:bg-stone-900/40 relative ${inquiry.resolved ? 'opacity-40 grayscale' : 'border-l-primary-container border-l-4'}`}>
+                    <div className="flex flex-col md:flex-row justify-between gap-8">
+                      <div className="flex-grow space-y-6">
+                        <div className="flex flex-wrap items-center gap-6">
+                          <div className="flex items-center gap-2 text-stone-500">
+                            <User className="w-3 h-3" />
+                            <span className="font-label uppercase tracking-widest text-[9px] font-bold">{inquiry.name}</span>
                           </div>
-                          <p className="font-body text-sm text-stone-400">{inquiry.reply}</p>
+                          <div className="flex items-center gap-2 text-stone-500">
+                            <Mail className="w-3 h-3" />
+                            <span className="font-label uppercase tracking-widest text-[9px] font-bold">{inquiry.email}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-secondary">
+                            <Briefcase className="w-3 h-3" />
+                            <span className="font-label uppercase tracking-widest text-[9px] font-bold">{inquiry.service}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-stone-700">
+                            <Clock className="w-3 h-3" />
+                            <span className="font-label uppercase tracking-widest text-[9px] font-bold">
+                              {inquiry.timestamp?.toDate().toLocaleDateString()}
+                            </span>
+                          </div>
                         </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex md:flex-col gap-4">
-                      {!inquiry.reply && (
-                        <button onClick={() => setShowInquiryReply(inquiry)} className="p-3 rounded-full bg-stone-800 text-stone-400 hover:text-white" title="Reply">
-                          <Reply className="w-5 h-5" />
+                        <p className="font-body text-xl text-white font-light leading-relaxed italic">"{inquiry.message}"</p>
+                        {inquiry.reply && (
+                          <div className="mt-8 p-6 bg-stone-900/50 border-l border-secondary/50">
+                            <div className="flex items-center gap-2 text-secondary text-[9px] font-label uppercase tracking-widest mb-3">
+                               <Reply className="w-3 h-3" /> Response Transmitted
+                            </div>
+                            <p className="font-body text-sm text-stone-400 italic">"{inquiry.reply}"</p>
+                          </div>
+                        )}
+                      </div>
+                      
+                      <div className="flex md:flex-col gap-3 justify-end">
+                        {!inquiry.reply && (
+                          <button onClick={() => setShowInquiryReply(inquiry)} className="p-4 bg-stone-900 text-stone-500 hover:text-white border border-stone-800 hover:border-stone-600 transition-all" title="Reply">
+                            <Reply className="w-5 h-5" />
+                          </button>
+                        )}
+                        <button onClick={() => markResolved(inquiry.id, inquiry.resolved)} className={`p-4 border border-stone-800 hover:border-stone-600 transition-all ${inquiry.resolved ? 'text-green-500 bg-green-500/5' : 'text-stone-500 bg-stone-900 hover:text-white'}`}>
+                          <CheckCircle2 className="w-5 h-5" />
                         </button>
-                      )}
-                      <button onClick={() => markResolved(inquiry.id, inquiry.resolved)} className={`p-3 rounded-full ${inquiry.resolved ? 'text-green-500' : 'text-stone-400'} hover:bg-stone-800`}>
-                        <CheckCircle2 className="w-5 h-5" />
-                      </button>
-                      <button onClick={() => deleteInquiry(inquiry.id)} className="p-3 rounded-full text-stone-400 hover:text-primary hover:bg-stone-800">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
+                        <button onClick={() => deleteInquiry(inquiry.id)} className="p-4 bg-stone-900 text-stone-500 hover:text-primary border border-stone-800 hover:border-red-900/30 transition-all">
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         )}
 
         {/* Blog Management View */}
         {activeTab === 'blogs' && (
-          <div className="space-y-8">
-            <div className="flex justify-between items-center bg-stone-950 p-6 border border-stone-800">
+          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="flex justify-between items-center bg-stone-900/40 p-6 border border-stone-800">
               <span className="font-label uppercase tracking-widest text-[10px] text-stone-500">Live Insights: {blogs.length}</span>
               <button 
-                onClick={() => setShowBlogForm({ title: '', excerpt: '', category: 'Architecture', content: '' })}
-                className="bg-primary-container text-white px-8 py-3 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-red-700 transition-all flex items-center gap-3"
+                onClick={() => setShowBlogForm({ title: '', excerpt: '', category: 'Architecture', content: '', imageUrl: '' })}
+                className="bg-primary-container text-white px-8 py-4 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-red-700 transition-all flex items-center gap-3"
               >
-                <Plus className="w-4 h-4" /> New Insight
+                <Plus className="w-4 h-4" /> New entry
               </button>
             </div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-6">
               {blogs.map(blog => (
-                <div key={blog.id} className="bg-stone-950 border border-stone-800 p-8 flex justify-between items-center group hover:bg-stone-900/30">
-                  <div>
-                    <span className="text-primary-container font-label uppercase text-[9px] tracking-widest block mb-2">{blog.category}</span>
-                    <h3 className="font-headline text-2xl text-white mb-2">{blog.title}</h3>
-                    <p className="font-body text-sm text-stone-500 italic truncate max-w-xl">{blog.excerpt}</p>
+                <div key={blog.id} className="bg-stone-950 border border-stone-800 p-8 flex flex-col md:flex-row justify-between items-start md:items-center group hover:bg-stone-900/30 transition-all">
+                  <div className="mb-6 md:mb-0">
+                    <span className="bg-primary/10 text-primary font-label uppercase text-[8px] tracking-[0.2em] px-2 py-1 mb-3 inline-block">{blog.category}</span>
+                    <h3 className="font-headline text-2xl text-white mb-2 font-light group-hover:text-primary transition-colors">{blog.title}</h3>
+                    <p className="font-body text-sm text-stone-500 italic truncate max-w-xl group-hover:text-stone-400 transition-colors">{blog.excerpt}</p>
                   </div>
-                  <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => setShowBlogForm(blog)} className="p-4 bg-stone-800 text-stone-400 hover:text-white rounded-full">
+                  <div className="flex gap-4 w-full md:w-auto">
+                    {blog.imageUrl && (
+                      <div className="hidden lg:flex items-center justify-center w-12 h-12 bg-stone-900 border border-stone-800 overflow-hidden">
+                        <img src={blog.imageUrl} alt="Asset" className="w-full h-full object-cover opacity-50" />
+                      </div>
+                    )}
+                    <button onClick={() => setShowBlogForm(blog)} className="flex-1 md:flex-none p-4 bg-stone-900 text-stone-500 hover:text-white border border-stone-800 hover:border-stone-600 transition-all">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => deleteBlog(blog.id)} className="p-4 bg-stone-800 text-stone-400 hover:text-primary rounded-full">
+                    <button onClick={() => deleteBlog(blog.id)} className="flex-1 md:flex-none p-4 bg-stone-900 text-stone-500 hover:text-primary border border-stone-800 hover:border-red-900/30 transition-all">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -396,32 +558,37 @@ const Admin = () => {
 
         {/* Events Management View */}
         {activeTab === 'events' && (
-          <div className="space-y-8">
-             <div className="flex justify-between items-center bg-stone-950 p-6 border border-stone-800">
+          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+             <div className="flex justify-between items-center bg-stone-900/40 p-6 border border-stone-800">
               <span className="font-label uppercase tracking-widest text-[10px] text-stone-500">Global Forums: {events.length}</span>
               <button 
-                onClick={() => setShowEventForm({ title: '', location: '', venue: '', date: '', action: 'Register', isPrimary: false })}
-                className="bg-secondary text-black px-8 py-3 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-yellow-500 transition-all flex items-center gap-3"
+                onClick={() => setShowEventForm({ title: '', location: '', venue: '', date: '', action: 'Register', isPrimary: false, registrationLink: '' })}
+                className="bg-secondary text-black px-8 py-4 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-yellow-500 transition-all flex items-center gap-3"
               >
                 <Plus className="w-4 h-4" /> Add Forum
               </button>
             </div>
-            <div className="grid grid-cols-1 gap-4">
+            <div className="grid grid-cols-1 gap-6">
               {events.map(event => (
-                <div key={event.id} className="bg-stone-950 border border-stone-800 p-8 flex justify-between items-center group hover:bg-stone-900/30">
-                  <div>
-                    <div className="flex items-center gap-4 mb-2">
-                       <span className="text-secondary font-label uppercase text-[9px] tracking-widest">{event.date}</span>
-                       {event.isPrimary && <span className="bg-primary-container text-white text-[7px] px-1.5 py-0.5 font-label uppercase tracking-widest">Featured</span>}
+                <div key={event.id} className="bg-stone-950 border border-stone-800 p-8 flex flex-col md:flex-row justify-between items-start md:items-center group hover:bg-stone-900/30 transition-all">
+                  <div className="mb-6 md:mb-0">
+                    <div className="flex items-center gap-4 mb-3">
+                       <span className="text-secondary font-label uppercase text-[8px] tracking-[0.2em] font-bold">{event.date}</span>
+                       {event.isPrimary && <span className="bg-primary/10 text-primary text-[7px] px-2 py-0.5 font-label uppercase tracking-[0.1em] font-bold border border-primary/20">Featured</span>}
                     </div>
-                    <h3 className="font-headline text-2xl text-white">{event.title}</h3>
-                    <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest mt-1">{event.location} • {event.venue}</p>
+                    <h3 className="font-headline text-2xl text-white font-light group-hover:text-primary transition-colors">{event.title}</h3>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-2">
+                       <p className="font-label text-stone-600 text-[10px] uppercase tracking-[0.2em] italic">{event.location} • {event.venue}</p>
+                       {event.registrationLink && (
+                         <a href={event.registrationLink} target="_blank" rel="noopener noreferrer" className="text-secondary font-label uppercase text-[8px] tracking-widest border-b border-secondary/20 hover:border-secondary transition-all">Portal <ExternalLink className="w-2 h-2 inline ml-1" /></a>
+                       )}
+                    </div>
                   </div>
-                  <div className="flex gap-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button onClick={() => setShowEventForm(event)} className="p-4 bg-stone-800 text-stone-400 hover:text-white rounded-full">
+                  <div className="flex gap-4 w-full md:w-auto">
+                    <button onClick={() => setShowEventForm(event)} className="flex-1 md:flex-none p-4 bg-stone-900 text-stone-500 hover:text-white border border-stone-800 hover:border-stone-600 transition-all">
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button onClick={() => deleteEvent(event.id)} className="p-4 bg-stone-800 text-stone-400 hover:text-primary rounded-full">
+                    <button onClick={() => deleteEvent(event.id)} className="flex-1 md:flex-none p-4 bg-stone-900 text-stone-500 hover:text-primary border border-stone-800 hover:border-red-900/30 transition-all">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -433,36 +600,44 @@ const Admin = () => {
 
         {/* MODALS */}
         {showInquiryReply && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-12 relative">
-              <button onClick={() => setShowInquiryReply(null)} className="absolute top-8 right-8 text-stone-500 hover:text-white">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-8">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-300">
+              <button onClick={() => setShowInquiryReply(null)} className="absolute top-6 right-6 md:top-8 md:right-8 text-stone-600 hover:text-white transition-colors">
                 <X className="w-6 h-6" />
               </button>
-              <h3 className="font-headline text-3xl text-white mb-2">Transmit Response</h3>
-              <p className="font-body text-stone-500 mb-8 italic">Responding to {showInquiryReply.name} ({showInquiryReply.email})</p>
+              <h3 className="font-headline text-3xl md:text-4xl text-white mb-2 font-light">Transmit Vision</h3>
+              <p className="font-body text-stone-500 mb-10 italic">Responding to {showInquiryReply.name}</p>
               
-              <textarea 
-                className="w-full bg-stone-900 border-none p-6 text-white font-body text-lg focus:ring-1 focus:ring-secondary min-h-[200px] mb-8"
-                placeholder="Curate your message..."
-                id="reply-text"
-              />
-              
-              <button 
-                onClick={() => sendReply(showInquiryReply, document.getElementById('reply-text').value)}
-                className="w-full bg-primary-container text-white py-4 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-neutral-800 transition-all flex items-center justify-center gap-3"
-              >
-                Transmit Vision <Reply className="w-4 h-4" />
-              </button>
+              <div className="space-y-8">
+                <div className="bg-stone-900/50 p-6 border-l border-white/10 mb-8 italic text-stone-400 text-sm">
+                   "{showInquiryReply.message}"
+                </div>
+                <textarea 
+                  className="w-full bg-stone-900 border border-stone-800 p-6 text-white font-body text-lg focus:ring-1 focus:ring-primary focus:border-primary transition-all min-h-[220px] outline-none"
+                  placeholder="Curate your message..."
+                  id="reply-text"
+                />
+                
+                <button 
+                  onClick={() => sendReply(showInquiryReply, document.getElementById('reply-text').value)}
+                  className="w-full bg-primary-container text-white py-5 font-label uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-red-700 transition-all flex items-center justify-center gap-3 shadow-xl"
+                >
+                  Confirm Transmission <Reply className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
         )}
 
         {showBlogForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl p-12 overflow-y-auto max-h-[90vh]">
-               <div className="flex justify-between items-center mb-12">
-                <h3 className="font-headline text-4xl text-white italic">{showBlogForm.id ? 'Edit Insight' : 'Draft New Insight'}</h3>
-                <button onClick={() => setShowBlogForm(null)} className="text-stone-500 hover:text-white"><X className="w-6 h-6" /></button>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl p-8 md:p-12 overflow-y-auto max-h-[95vh] animate-in slide-in-from-bottom-8 duration-500 shadow-2xl relative">
+               <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
+                <div>
+                  <h3 className="font-headline text-3xl md:text-5xl text-white italic font-light">{showBlogForm.id ? 'Refine Insight' : 'Draft New Insight'}</h3>
+                  <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-3">Archiving curated vision</p>
+                </div>
+                <button onClick={() => setShowBlogForm(null)} className="text-stone-600 hover:text-white transition-colors"><X className="w-8 h-8" /></button>
               </div>
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -472,39 +647,47 @@ const Admin = () => {
                   title: formData.get('title'),
                   category: formData.get('category'),
                   excerpt: formData.get('excerpt'),
-                  content: formData.get('content')
+                  content: formData.get('content'),
+                  imageUrl: formData.get('imageUrl')
                 });
-              }} className="space-y-8">
-                <div className="grid grid-cols-2 gap-8">
-                  <div className="space-y-2">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Title of Insight</label>
-                    <input name="title" defaultValue={showBlogForm.title} required className="w-full bg-stone-900 border-none p-4 text-white focus:ring-1 focus:ring-primary" />
+              }} className="space-y-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-3">
+                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Title of Insight</label>
+                    <input name="title" defaultValue={showBlogForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Curatorial Category</label>
-                    <input name="category" defaultValue={showBlogForm.category} required className="w-full bg-stone-900 border-none p-4 text-white focus:ring-1 focus:ring-primary" />
+                  <div className="space-y-3">
+                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Curatorial Category</label>
+                    <input name="category" defaultValue={showBlogForm.category} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Narrative Excerpt</label>
-                  <textarea name="excerpt" defaultValue={showBlogForm.excerpt} required rows="2" className="w-full bg-stone-900 border-none p-4 text-white focus:ring-1 focus:ring-primary" />
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Image Site (URL)</label>
+                  <input name="imageUrl" defaultValue={showBlogForm.imageUrl} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
                 </div>
-                <div className="space-y-2">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Body Content (Markdown)</label>
-                  <textarea name="content" defaultValue={showBlogForm.content} required rows="10" className="w-full bg-stone-950 border border-stone-800 p-6 text-white font-body text-sm leading-relaxed focus:ring-1 focus:ring-primary" />
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Narrative Excerpt</label>
+                  <textarea name="excerpt" defaultValue={showBlogForm.excerpt} required rows="2" className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
                 </div>
-                <button className="w-full bg-primary-container text-white py-5 font-label uppercase tracking-[0.2em] font-bold hover:bg-red-700 transition-all">Publish into Archive</button>
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Body Content (Structure)</label>
+                  <textarea name="content" defaultValue={showBlogForm.content} required rows="12" className="w-full bg-stone-950 border border-stone-800 p-8 text-white font-body text-base leading-relaxed focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
+                </div>
+                <button className="w-full bg-primary-container text-white py-6 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-red-700 transition-all shadow-xl active:scale-[0.99]">Publish into Archive</button>
               </form>
             </div>
           </div>
         )}
 
         {showEventForm && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-lg p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-12">
-               <div className="flex justify-between items-center mb-12">
-                <h3 className="font-headline text-4xl text-white italic">{showEventForm.id ? 'Edit engagement' : 'New Engagement'}</h3>
-                <button onClick={() => setShowEventForm(null)} className="text-stone-500 hover:text-white"><X className="w-6 h-6" /></button>
+          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 animate-in zoom-in-95 duration-300 relative shadow-2xl">
+               <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
+                <div>
+                  <h3 className="font-headline text-3xl md:text-4xl text-white italic font-light">{showEventForm.id ? 'Refine Engagement' : 'New Engagement'}</h3>
+                  <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-2">Synchronizing global forum</p>
+                </div>
+                <button onClick={() => setShowEventForm(null)} className="text-stone-600 hover:text-white transition-colors"><X className="w-6 h-6" /></button>
               </div>
               <form onSubmit={(e) => {
                 e.preventDefault();
@@ -515,37 +698,132 @@ const Admin = () => {
                   date: formData.get('date'),
                   location: formData.get('location'),
                   venue: formData.get('venue'),
-                  isPrimary: formData.get('isPrimary') === 'on'
+                  isPrimary: formData.get('isPrimary') === 'on',
+                  registrationLink: formData.get('registrationLink')
                 });
-              }} className="space-y-6">
-                <div className="space-y-2">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Forum Title</label>
-                  <input name="title" defaultValue={showEventForm.title} required className="w-full bg-stone-900 border-none p-4 text-white focus:ring-1 focus:ring-secondary" />
+              }} className="space-y-8">
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Forum Title</label>
+                  <input name="title" defaultValue={showEventForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none italic" />
                 </div>
-                <div className="grid grid-cols-2 gap-8">
-                   <div className="space-y-2">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Date</label>
-                    <input name="date" defaultValue={showEventForm.date} placeholder="e.g. Oct 12, 2024" className="w-full bg-stone-900 border-none p-4 text-white" />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                   <div className="space-y-3">
+                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Chronology (Date)</label>
+                    <input name="date" defaultValue={showEventForm.date} placeholder="Oct 12, 2024" required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
                   </div>
-                  <div className="space-y-2">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Location</label>
-                    <input name="location" defaultValue={showEventForm.location} className="w-full bg-stone-900 border-none p-4 text-white" />
+                  <div className="space-y-3">
+                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Geography (Location)</label>
+                    <input name="location" defaultValue={showEventForm.location} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500">Venue</label>
-                  <input name="venue" defaultValue={showEventForm.venue} className="w-full bg-stone-900 border-none p-4 text-white" />
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Venue Site</label>
+                  <input name="venue" defaultValue={showEventForm.venue} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
                 </div>
-                <div className="flex items-center gap-4 py-4">
-                  <input type="checkbox" name="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-4 h-4 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary" />
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-300">Feature this Engagement</label>
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL)</label>
+                  <input name="registrationLink" defaultValue={showEventForm.registrationLink} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
                 </div>
-                <button className="w-full bg-secondary text-black py-5 font-label uppercase tracking-[0.2em] font-bold hover:bg-neutral-800 hover:text-white transition-all">Synchronize Forum</button>
+                <div className="flex items-center gap-4 py-4 group">
+                  <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />
+                  <label htmlFor="isPrimary" className="font-label uppercase text-[10px] tracking-[0.2em] text-stone-300 group-hover:text-secondary transition-colors cursor-pointer">Feature this Engagement</label>
+                </div>
+                <button className="w-full bg-secondary text-black py-6 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-neutral-800 hover:text-white transition-all shadow-xl">Synchronize Forum</button>
               </form>
             </div>
           </div>
         )}
+        
+        {/* CUSTOM CONFIRM MODAL */}
+        {confirmModal && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-6">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-lg p-10 md:p-12 animate-in zoom-in-95 duration-300 shadow-[0_0_100px_rgba(255,0,0,0.1)]">
+               <div className="w-16 h-1 bg-primary mb-10"></div>
+               <h3 className="font-headline text-3xl text-white mb-6 italic">{confirmModal.title}</h3>
+               <p className="font-body text-stone-500 text-base leading-relaxed mb-12 italic">
+                 {confirmModal.message}
+               </p>
+               <div className="flex flex-col gap-4">
+                 <button 
+                  onClick={confirmModal.onConfirm}
+                  className="w-full bg-primary-container text-white py-5 font-label uppercase tracking-[0.2em] text-[10px] font-bold hover:bg-red-700 transition-all shadow-xl"
+                 >
+                   {confirmModal.confirmText}
+                 </button>
+                 <button 
+                  onClick={() => setConfirmModal(null)}
+                  className="w-full bg-stone-900 text-stone-500 py-5 font-label uppercase tracking-[0.2em] text-[10px] font-bold hover:text-white border border-stone-800 transition-all"
+                 >
+                   Relinquish
+                 </button>
+               </div>
+            </div>
+          </div>
+        )}
+
+        {/* SYSTEM ALERT MODAL */}
+        {systemAlert && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-3xl p-6">
+             <div className="bg-stone-950 border border-stone-800 w-full max-w-md p-10 md:p-12 animate-in zoom-in-95 duration-300">
+               <div className="flex justify-between items-start mb-8">
+                  <div className="w-12 h-1 bg-secondary"></div>
+                  <button onClick={() => setSystemAlert(null)} className="text-stone-700 hover:text-white transition-colors"><X className="w-5 h-5" /></button>
+               </div>
+               <h3 className="font-headline text-2xl text-white mb-4">{systemAlert.title}</h3>
+               <p className="font-body text-stone-500 text-sm italic leading-relaxed mb-10">
+                 {systemAlert.message}
+               </p>
+               <button 
+                onClick={() => setSystemAlert(null)}
+                className="w-full bg-stone-900 text-secondary py-5 font-label uppercase tracking-[0.2em] text-[10px] font-bold border border-stone-800 hover:border-secondary/30 transition-all"
+               >
+                 Acknowledge
+               </button>
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Mobile Bottom Navigation Bar */}
+      <nav className="fixed bottom-0 left-0 w-full bg-stone-950/90 backdrop-blur-2xl z-50 px-4 md:hidden border-t border-white/5">
+        <div className="flex justify-around items-center py-4">
+          <button 
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex flex-col items-center gap-1 py-1 transition-all ${activeTab === 'dashboard' ? 'text-primary' : 'text-stone-500 opacity-60'}`}
+          >
+            <LayoutDashboard className="w-5 h-5" />
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">Dashboard</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('blogs')}
+            className={`flex flex-col items-center gap-1 py-1 transition-all ${activeTab === 'blogs' ? 'text-primary' : 'text-stone-500 opacity-60'}`}
+          >
+            <FileText className="w-5 h-5" />
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">Insights</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('inquiries')}
+            className={`flex flex-col items-center gap-1 py-1 transition-all ${activeTab === 'inquiries' ? 'text-primary' : 'text-stone-500 opacity-60'}`}
+          >
+            <div className="relative">
+              <MessageSquare className="w-5 h-5" />
+              {inquiries.filter(i => !i.resolved).length > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-[6px] w-2.5 h-2.5 flex items-center justify-center rounded-full font-bold">
+                  {inquiries.filter(i => !i.resolved).length}
+                </span>
+              )}
+            </div>
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">waitlist</span>
+          </button>
+          <button 
+            onClick={() => setActiveTab('events')}
+            className={`flex flex-col items-center gap-1 py-1 transition-all ${activeTab === 'events' ? 'text-primary' : 'text-stone-500 opacity-60'}`}
+          >
+            <Calendar className="w-5 h-5" />
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">Forums</span>
+          </button>
+        </div>
+      </nav>
     </div>
   );
 };
