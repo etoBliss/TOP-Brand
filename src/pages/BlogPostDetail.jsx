@@ -8,6 +8,7 @@ const BlogPostDetail = () => {
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     const fetchBlog = async () => {
@@ -80,17 +81,25 @@ const BlogPostDetail = () => {
                    </div>
                    <div>
                      <h4 className="font-label uppercase text-[10px] tracking-widest text-stone-600 mb-6 font-bold">Engagement</h4>
-                     <button 
-                        onClick={() => {
-                            if (navigator.share) {
-                                navigator.share({ title: blog.title, url: window.location.href });
-                            }
-                        }}
-                        className="flex items-center gap-3 text-stone-400 hover:text-white transition-all font-label uppercase text-[10px] tracking-widest group"
-                     >
-                        <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" /> Disseminate Insight
-                     </button>
-                   </div>
+                      <button 
+                         onClick={async () => {
+                             const url = window.location.href;
+                             try {
+                               await navigator.clipboard.writeText(url);
+                               setCopied(true);
+                               setTimeout(() => setCopied(false), 2000);
+                             } catch {
+                               if (navigator.share) {
+                                 navigator.share({ title: blog.title, url });
+                               }
+                             }
+                         }}
+                         className="flex items-center gap-3 text-stone-400 hover:text-white transition-all font-label uppercase text-[10px] tracking-widest group"
+                      >
+                         <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
+                         {copied ? <span className="text-secondary">Link Copied!</span> : 'Disseminate Insight'}
+                      </button>
+                    </div>
                 </div>
              </aside>
              

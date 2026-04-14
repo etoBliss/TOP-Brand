@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { auth, db } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useNavigate, Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import { uploadToCloudinary } from '../lib/uploadToCloudinary';
 import curator from '../assets/Frame 5.svg';
 
 // EmailJS Configuration (Replace with your keys)
@@ -48,6 +49,13 @@ const Admin = () => {
   const [showEventForm, setShowEventForm] = useState(null);
   const [confirmModal, setConfirmModal] = useState(null); // { title: string, message: string, onConfirm: () => void, confirmText: string }
   const [systemAlert, setSystemAlert] = useState(null); // { title: string, message: string }
+
+  // Image upload state
+  const [blogImageFile, setBlogImageFile] = useState(null);
+  const [blogImagePreview, setBlogImagePreview] = useState(null);
+  const [eventImageFile, setEventImageFile] = useState(null);
+  const [eventImagePreview, setEventImagePreview] = useState(null);
+  const [uploading, setUploading] = useState(false);
   
   const navigate = useNavigate();
 
@@ -598,7 +606,7 @@ const Admin = () => {
 
         {/* MODALS */}
         {showInquiryReply && (
-          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-8 overflow-y-auto">
+          <div className="fixed inset-0 md:left-64 z-[100] flex items-start md:items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-8 overflow-y-auto">
             <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-300 my-auto">
               <button onClick={() => setShowInquiryReply(null)} className="absolute top-6 right-6 md:top-8 md:right-8 text-stone-600 hover:text-white transition-colors">
                 <X className="w-6 h-6" />
@@ -628,111 +636,184 @@ const Admin = () => {
         )}
 
         {showBlogForm && (
-          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8 overflow-y-auto">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl p-6 md:p-12 animate-in slide-in-from-bottom-8 duration-500 shadow-2xl relative my-4 md:my-auto">
-               <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
-                <div>
-                  <h3 className="font-headline text-3xl md:text-5xl text-white italic font-light">{showBlogForm.id ? 'Refine Insight' : 'Draft New Insight'}</h3>
-                  <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-3">Archiving curated vision</p>
+          <div className="fixed inset-0 md:left-64 z-[100] overflow-y-auto bg-black/95 backdrop-blur-2xl">
+            <div className="flex min-h-full items-start md:items-center justify-center p-4 md:p-8">
+              <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl flex flex-col animate-in slide-in-from-bottom-8 duration-500 shadow-2xl my-4 md:my-0">
+                {/* Header */}
+                <div className="flex justify-between items-center px-6 md:px-12 pt-8 pb-6 border-b border-stone-800 sticky top-0 bg-stone-950 z-10">
+                  <div>
+                    <h3 className="font-headline text-2xl md:text-4xl text-white italic font-light">{showBlogForm.id ? 'Refine Insight' : 'Draft New Insight'}</h3>
+                    <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-2">Archiving curated vision</p>
+                  </div>
+                  <button onClick={() => setShowBlogForm(null)} className="text-stone-600 hover:text-white transition-colors flex-shrink-0 ml-4">
+                    <X className="w-7 h-7" />
+                  </button>
                 </div>
-                <button onClick={() => setShowBlogForm(null)} className="text-stone-600 hover:text-white transition-colors"><X className="w-8 h-8" /></button>
+                {/* Form Body */}
+                <div className="px-6 md:px-12 py-8">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    let imageUrl = showBlogForm.imageUrl || '';
+                    if (blogImageFile) {
+                      setUploading(true);
+                      try { imageUrl = await uploadToCloudinary(blogImageFile); }
+                      catch { imageUrl = showBlogForm.imageUrl || ''; }
+                      setUploading(false);
+                    }
+                    saveBlog({
+                      ...showBlogForm,
+                      title: formData.get('title'),
+                      category: formData.get('category'),
+                      excerpt: formData.get('excerpt'),
+                      content: formData.get('content'),
+                      imageUrl
+                    });
+                    setBlogImageFile(null); setBlogImagePreview(null);
+                  }} className="space-y-8">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-3">
+                        <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Title of Insight</label>
+                        <input name="title" defaultValue={showBlogForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Curatorial Category</label>
+                        <input name="category" defaultValue={showBlogForm.category} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
+                      </div>
+                    </div>
+                    {/* Image upload */}
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Cover Image</label>
+                      <label className="flex items-center gap-4 p-4 bg-stone-900/50 border border-dashed border-stone-700 hover:border-primary transition-all cursor-pointer group">
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          setBlogImageFile(file);
+                          setBlogImagePreview(URL.createObjectURL(file));
+                        }} />
+                        {blogImagePreview || showBlogForm.imageUrl ? (
+                          <img src={blogImagePreview || showBlogForm.imageUrl} alt="preview" className="w-16 h-16 object-cover border border-stone-700" />
+                        ) : (
+                          <div className="w-16 h-16 bg-stone-800 flex items-center justify-center border border-stone-700">
+                            <span className="text-stone-600 text-2xl">+</span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-label uppercase text-[10px] tracking-widest text-stone-400 group-hover:text-white transition-colors">{blogImageFile ? blogImageFile.name : 'Choose image file'}</p>
+                          <p className="text-stone-600 text-[9px] mt-1">JPG, PNG, WEBP — uploaded to Cloudinary</p>
+                        </div>
+                      </label>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Narrative Excerpt</label>
+                      <textarea name="excerpt" defaultValue={showBlogForm.excerpt} required rows="3" className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Body Content</label>
+                      <textarea name="content" defaultValue={showBlogForm.content} required rows="10" className="w-full bg-stone-950 border border-stone-800 p-6 text-white font-body text-base leading-relaxed focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
+                    </div>
+                    <button disabled={uploading} className="w-full bg-primary-container text-white py-5 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-red-700 transition-all shadow-xl active:scale-[0.99] disabled:opacity-50 disabled:cursor-wait">
+                      {uploading ? 'Uploading Image…' : 'Publish into Archive'}
+                    </button>
+                  </form>
+                </div>
               </div>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                saveBlog({
-                  ...showBlogForm,
-                  title: formData.get('title'),
-                  category: formData.get('category'),
-                  excerpt: formData.get('excerpt'),
-                  content: formData.get('content'),
-                  imageUrl: formData.get('imageUrl')
-                });
-              }} className="space-y-10">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-3">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Title of Insight</label>
-                    <input name="title" defaultValue={showBlogForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Curatorial Category</label>
-                    <input name="category" defaultValue={showBlogForm.category} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Image Site (URL)</label>
-                  <input name="imageUrl" defaultValue={showBlogForm.imageUrl} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Narrative Excerpt</label>
-                  <textarea name="excerpt" defaultValue={showBlogForm.excerpt} required rows="2" className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none italic" />
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Body Content (Structure)</label>
-                  <textarea name="content" defaultValue={showBlogForm.content} required rows="12" className="w-full bg-stone-950 border border-stone-800 p-8 text-white font-body text-base leading-relaxed focus:ring-1 focus:ring-primary focus:border-primary transition-all outline-none" />
-                </div>
-                <button className="w-full bg-primary-container text-white py-6 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-red-700 transition-all shadow-xl active:scale-[0.99]">Publish into Archive</button>
-              </form>
             </div>
           </div>
         )}
 
         {showEventForm && (
-          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8 overflow-y-auto">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-6 md:p-12 animate-in zoom-in-95 duration-300 relative shadow-2xl my-4 md:my-auto">
-               <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
-                <div>
-                  <h3 className="font-headline text-3xl md:text-4xl text-white italic font-light">{showEventForm.id ? 'Refine Engagement' : 'New Engagement'}</h3>
-                  <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-2">Synchronizing global forum</p>
+          <div className="fixed inset-0 md:left-64 z-[100] overflow-y-auto bg-black/95 backdrop-blur-2xl">
+            <div className="flex min-h-full items-start md:items-center justify-center p-4 md:p-8">
+              <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl flex flex-col animate-in zoom-in-95 duration-300 shadow-2xl my-4 md:my-0">
+                {/* Header */}
+                <div className="flex justify-between items-center px-6 md:px-12 pt-8 pb-6 border-b border-stone-800 sticky top-0 bg-stone-950 z-10">
+                  <div>
+                    <h3 className="font-headline text-2xl md:text-4xl text-white italic font-light">{showEventForm.id ? 'Refine Engagement' : 'New Engagement'}</h3>
+                    <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-2">Synchronizing global forum</p>
+                  </div>
+                  <button onClick={() => setShowEventForm(null)} className="text-stone-600 hover:text-white transition-colors flex-shrink-0 ml-4">
+                    <X className="w-6 h-6" />
+                  </button>
                 </div>
-                <button onClick={() => setShowEventForm(null)} className="text-stone-600 hover:text-white transition-colors"><X className="w-6 h-6" /></button>
+                {/* Form Body */}
+                <div className="px-6 md:px-12 py-8">
+                  <form onSubmit={async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target);
+                    let imageUrl = showEventForm.imageUrl || '';
+                    if (eventImageFile) {
+                      setUploading(true);
+                      try { imageUrl = await uploadToCloudinary(eventImageFile); }
+                      catch { imageUrl = showEventForm.imageUrl || ''; }
+                      setUploading(false);
+                    }
+                    saveEvent({
+                      ...showEventForm,
+                      title: formData.get('title'),
+                      date: formData.get('date'),
+                      location: formData.get('location'),
+                      venue: formData.get('venue'),
+                      isPrimary: formData.get('isPrimary') === 'on',
+                      registrationLink: formData.get('registrationLink'),
+                      imageUrl
+                    });
+                    setEventImageFile(null); setEventImagePreview(null);
+                  }} className="space-y-6">
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Forum Title</label>
+                      <input name="title" defaultValue={showEventForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none italic" />
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-3">
+                        <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Chronology (Date)</label>
+                        <input name="date" defaultValue={showEventForm.date} placeholder="Oct 12, 2024" required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Geography (Location)</label>
+                        <input name="location" defaultValue={showEventForm.location} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Venue Site</label>
+                      <input name="venue" defaultValue={showEventForm.venue} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL)</label>
+                      <input name="registrationLink" defaultValue={showEventForm.registrationLink} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Cover Image</label>
+                      <label className="flex items-center gap-4 p-4 bg-stone-900/50 border border-dashed border-stone-700 hover:border-secondary transition-all cursor-pointer group">
+                        <input type="file" accept="image/*" className="hidden" onChange={(e) => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          setEventImageFile(file);
+                          setEventImagePreview(URL.createObjectURL(file));
+                        }} />
+                        {eventImagePreview || showEventForm.imageUrl ? (
+                          <img src={eventImagePreview || showEventForm.imageUrl} alt="preview" className="w-16 h-16 object-cover border border-stone-700" />
+                        ) : (
+                          <div className="w-16 h-16 bg-stone-800 flex items-center justify-center border border-stone-700">
+                            <span className="text-stone-600 text-2xl">+</span>
+                          </div>
+                        )}
+                        <div>
+                          <p className="font-label uppercase text-[10px] tracking-widest text-stone-400 group-hover:text-white transition-colors">{eventImageFile ? eventImageFile.name : 'Choose image file'}</p>
+                          <p className="text-stone-600 text-[9px] mt-1">JPG, PNG, WEBP — uploaded to Cloudinary</p>
+                        </div>
+                      </label>
+                    </div>
+                    <div className="flex items-center gap-4 py-2 group">
+                      <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />
+                      <label htmlFor="isPrimary" className="font-label uppercase text-[10px] tracking-[0.2em] text-stone-300 group-hover:text-secondary transition-colors cursor-pointer">Feature this Engagement</label>
+                    </div>
+                    <button disabled={uploading} className="w-full bg-secondary text-black py-5 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-neutral-800 hover:text-white transition-all shadow-xl disabled:opacity-50 disabled:cursor-wait">
+                      {uploading ? 'Uploading Image…' : 'Synchronize Forum'}
+                    </button>
+                  </form>
+                </div>
               </div>
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target);
-                saveEvent({
-                  ...showEventForm,
-                  title: formData.get('title'),
-                  date: formData.get('date'),
-                  location: formData.get('location'),
-                  venue: formData.get('venue'),
-                  isPrimary: formData.get('isPrimary') === 'on',
-                  registrationLink: formData.get('registrationLink'),
-                  imageUrl: formData.get('imageUrl')
-                });
-              }} className="space-y-8">
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Forum Title</label>
-                  <input name="title" defaultValue={showEventForm.title} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none italic" />
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                   <div className="space-y-3">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Chronology (Date)</label>
-                    <input name="date" defaultValue={showEventForm.date} placeholder="Oct 12, 2024" required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
-                  </div>
-                  <div className="space-y-3">
-                    <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Geography (Location)</label>
-                    <input name="location" defaultValue={showEventForm.location} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Venue Site</label>
-                  <input name="venue" defaultValue={showEventForm.venue} required className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL)</label>
-                  <input name="registrationLink" defaultValue={showEventForm.registrationLink} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
-                </div>
-                <div className="space-y-3">
-                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Cover Image (URL)</label>
-                  <input name="imageUrl" defaultValue={showEventForm.imageUrl} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none" />
-                </div>
-                <div className="flex items-center gap-4 py-4 group">
-                  <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />
-                  <label htmlFor="isPrimary" className="font-label uppercase text-[10px] tracking-[0.2em] text-stone-300 group-hover:text-secondary transition-colors cursor-pointer">Feature this Engagement</label>
-                </div>
-                <button className="w-full bg-secondary text-black py-6 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-neutral-800 hover:text-white transition-all shadow-xl">Synchronize Forum</button>
-              </form>
             </div>
           </div>
         )}
