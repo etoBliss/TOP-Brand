@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
 import { ArrowRight, Calendar, MapPin, Ticket } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const Events = () => {
   const [events, setEvents] = useState([]);
@@ -28,34 +29,36 @@ const Events = () => {
       {/* Events List */}
       <section className="py-12 px-8 md:px-16">
         <div className="max-w-6xl mx-auto space-y-1">
-          {events.map((event, idx) => (
-            <div key={idx} className="group py-16 flex flex-col md:grid md:grid-cols-12 items-center gap-12 border-t border-stone-800 hover:bg-stone-900 transition-colors px-6">
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-3 mb-2">
-                  <Calendar className="w-4 h-4 text-stone-600" />
-                  <span className="font-label text-stone-500 text-[11px] uppercase tracking-widest">{event.date}</span>
+          {events.map((event) => (
+            <Link key={event.id} to={`/event/${event.id}`} className="group block">
+              <div className="py-16 flex flex-col md:grid md:grid-cols-12 items-center gap-12 border-t border-stone-800 hover:bg-stone-900 transition-colors px-6">
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Calendar className="w-4 h-4 text-stone-600" />
+                    <span className="font-label text-stone-500 text-[11px] uppercase tracking-widest">{event.date}</span>
+                  </div>
+                </div>
+                <div className="md:col-span-6">
+                  <h4 className="font-headline text-3xl font-light text-white group-hover:text-primary transition-colors mb-2">{event.title}</h4>
+                  <div className="flex items-center gap-3">
+                    <MapPin className="w-3 h-3 text-stone-600" />
+                    <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest">{event.location}</p>
+                  </div>
+                </div>
+                <div className="md:col-span-2">
+                  <div className="flex items-center gap-3">
+                    <Building2 className="w-3 h-3 text-secondary/50" />
+                    <span className="text-secondary font-label text-[10px] uppercase tracking-widest">{event.venue}</span>
+                  </div>
+                </div>
+                <div className="md:col-span-2 text-right w-full">
+                  <div className={`w-full flex items-center justify-between px-6 py-3 text-[10px] font-label uppercase tracking-widest transition-all text-center ${event.isPrimary ? 'bg-primary-container text-white hover:bg-red-700' : 'border border-outline-variant/30 text-white group-hover:bg-white group-hover:text-black'}`}>
+                    {event.isPrimary ? 'Attend' : 'Learn More'}
+                    <ArrowRight className="w-3 h-3 transition-transform group-hover:translate-x-1" />
+                  </div>
                 </div>
               </div>
-              <div className="md:col-span-6">
-                <h4 className="font-headline text-3xl font-light text-white group-hover:text-primary transition-colors mb-2">{event.title}</h4>
-                <div className="flex items-center gap-3">
-                  <MapPin className="w-3 h-3 text-stone-600" />
-                  <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest">{event.location}</p>
-                </div>
-              </div>
-              <div className="md:col-span-2">
-                <div className="flex items-center gap-3">
-                  <Ticket className="w-3 h-3 text-secondary/50" />
-                  <span className="text-secondary font-label text-[10px] uppercase tracking-widest">{event.venue}</span>
-                </div>
-              </div>
-              <div className="md:col-span-2 text-right w-full">
-                <button className={`w-full group/btn flex items-center justify-between px-6 py-3 text-[10px] font-label uppercase tracking-widest transition-all ${event.isPrimary ? 'bg-primary-container text-white hover:bg-red-700' : 'border border-outline-variant/30 text-white hover:bg-white hover:text-black'}`}>
-                  {event.action}
-                  <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
-                </button>
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>

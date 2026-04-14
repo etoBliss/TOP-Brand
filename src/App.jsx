@@ -10,6 +10,8 @@ import Admin from './pages/Admin';
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
+import BlogPostDetail from './pages/BlogPostDetail';
+import EventDetail from './pages/EventDetail';
 
 import { useLocation } from 'react-router-dom';
 
@@ -26,7 +28,9 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/blog" element={<Blog />} />
+          <Route path="/blog/:id" element={<BlogPostDetail />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/connect" element={<Connect />} />
           <Route path="/login" element={<Login />} />
           <Route 

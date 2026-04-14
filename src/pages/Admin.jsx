@@ -516,10 +516,9 @@ const Admin = () => {
           </div>
         )}
 
-        {/* Blog Management View */}
         {activeTab === 'blogs' && (
-          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
-            <div className="flex justify-between items-center bg-stone-900/40 p-6 border border-stone-800">
+          <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500 overflow-hidden">
+            <div className="flex flex-wrap justify-between items-center gap-4 bg-stone-900/40 p-6 border border-stone-800">
               <span className="font-label uppercase tracking-widest text-[10px] text-stone-500">Live Insights: {blogs.length}</span>
               <button 
                 onClick={() => setShowBlogForm({ title: '', excerpt: '', category: 'Architecture', content: '', imageUrl: '' })}
@@ -530,13 +529,13 @@ const Admin = () => {
             </div>
             <div className="grid grid-cols-1 gap-6">
               {blogs.map(blog => (
-                <div key={blog.id} className="bg-stone-950 border border-stone-800 p-8 flex flex-col md:flex-row justify-between items-start md:items-center group hover:bg-stone-900/30 transition-all">
-                  <div className="mb-6 md:mb-0">
+                <div key={blog.id} className="bg-stone-950 border border-stone-800 p-6 md:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 group hover:bg-stone-900/30 transition-all min-w-0">
+                  <div className="flex-1 min-w-0">
                     <span className="bg-primary/10 text-primary font-label uppercase text-[8px] tracking-[0.2em] px-2 py-1 mb-3 inline-block">{blog.category}</span>
-                    <h3 className="font-headline text-2xl text-white mb-2 font-light group-hover:text-primary transition-colors">{blog.title}</h3>
-                    <p className="font-body text-sm text-stone-500 italic truncate max-w-xl group-hover:text-stone-400 transition-colors">{blog.excerpt}</p>
+                    <h3 className="font-headline text-xl md:text-2xl text-white mb-2 font-light group-hover:text-primary transition-colors break-words">{blog.title}</h3>
+                    <p className="font-body text-sm text-stone-500 italic group-hover:text-stone-400 transition-colors break-words">{blog.excerpt}</p>
                   </div>
-                  <div className="flex gap-4 w-full md:w-auto">
+                  <div className="flex gap-4 w-full md:w-auto flex-shrink-0">
                     {blog.imageUrl && (
                       <div className="hidden lg:flex items-center justify-center w-12 h-12 bg-stone-900 border border-stone-800 overflow-hidden">
                         <img src={blog.imageUrl} alt="Asset" className="w-full h-full object-cover opacity-50" />
@@ -599,8 +598,8 @@ const Admin = () => {
 
         {/* MODALS */}
         {showInquiryReply && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-300">
+          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/90 backdrop-blur-xl p-4 md:p-8 overflow-y-auto">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 relative shadow-[0_0_50px_rgba(0,0,0,0.8)] animate-in zoom-in-95 duration-300 my-auto">
               <button onClick={() => setShowInquiryReply(null)} className="absolute top-6 right-6 md:top-8 md:right-8 text-stone-600 hover:text-white transition-colors">
                 <X className="w-6 h-6" />
               </button>
@@ -629,8 +628,8 @@ const Admin = () => {
         )}
 
         {showBlogForm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl p-8 md:p-12 overflow-y-auto max-h-[95vh] animate-in slide-in-from-bottom-8 duration-500 shadow-2xl relative">
+          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8 overflow-y-auto">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-4xl p-6 md:p-12 animate-in slide-in-from-bottom-8 duration-500 shadow-2xl relative my-4 md:my-auto">
                <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
                 <div>
                   <h3 className="font-headline text-3xl md:text-5xl text-white italic font-light">{showBlogForm.id ? 'Refine Insight' : 'Draft New Insight'}</h3>
@@ -679,8 +678,8 @@ const Admin = () => {
         )}
 
         {showEventForm && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8">
-            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-8 md:p-12 animate-in zoom-in-95 duration-300 relative shadow-2xl">
+          <div className="fixed inset-0 z-[100] flex items-start md:items-center justify-center bg-black/95 backdrop-blur-2xl p-4 md:p-8 overflow-y-auto">
+            <div className="bg-stone-950 border border-stone-800 w-full max-w-2xl p-6 md:p-12 animate-in zoom-in-95 duration-300 relative shadow-2xl my-4 md:my-auto">
                <div className="flex justify-between items-center mb-12 border-b border-stone-800 pb-8">
                 <div>
                   <h3 className="font-headline text-3xl md:text-4xl text-white italic font-light">{showEventForm.id ? 'Refine Engagement' : 'New Engagement'}</h3>
@@ -698,7 +697,8 @@ const Admin = () => {
                   location: formData.get('location'),
                   venue: formData.get('venue'),
                   isPrimary: formData.get('isPrimary') === 'on',
-                  registrationLink: formData.get('registrationLink')
+                  registrationLink: formData.get('registrationLink'),
+                  imageUrl: formData.get('imageUrl')
                 });
               }} className="space-y-8">
                 <div className="space-y-3">
@@ -722,6 +722,10 @@ const Admin = () => {
                 <div className="space-y-3">
                   <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL)</label>
                   <input name="registrationLink" defaultValue={showEventForm.registrationLink} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white outline-none" />
+                </div>
+                <div className="space-y-3">
+                  <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Cover Image (URL)</label>
+                  <input name="imageUrl" defaultValue={showEventForm.imageUrl} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-5 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none" />
                 </div>
                 <div className="flex items-center gap-4 py-4 group">
                   <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />

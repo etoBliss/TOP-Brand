@@ -106,27 +106,32 @@ const Blog = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-16">
               {blogs.map((post) => (
-                <article key={post.id} className="group cursor-pointer">
-                  <div className="aspect-[4/5] md:aspect-video w-full overflow-hidden mb-6 md:mb-4 bg-surface-container-low">
-                    {/* Placeholder for blog image if exists, or just a colored background like the snippet */}
-                    <div className="w-full h-full bg-surface-container-high group-hover:bg-primary-container/10 transition-all duration-700 flex items-center justify-center">
-                       <span className="font-headline text-stone-800 text-5xl md:text-6xl italic group-hover:scale-110 transition-transform duration-700">{post.title.charAt(0)}</span>
+                <Link key={post.id} to={`/blog/${post.id}`} className="group cursor-pointer block">
+                  <article>
+                    <div className="aspect-[4/5] md:aspect-video w-full overflow-hidden mb-6 md:mb-4 bg-surface-container-low">
+                      <div className="w-full h-full bg-surface-container-high group-hover:bg-primary-container/10 transition-all duration-700 flex items-center justify-center relative">
+                         {post.imageUrl ? (
+                           <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity" />
+                         ) : (
+                           <span className="font-headline text-stone-800 text-5xl md:text-6xl italic group-hover:scale-110 transition-transform duration-700">{post.title.charAt(0)}</span>
+                         )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-4 md:space-y-0">
-                    <div className="flex items-center gap-4 mb-2">
-                      <span className="font-label uppercase tracking-widest text-[10px] md:text-[9px] text-primary">{post.category}</span>
-                      <span className="text-stone-600 text-[10px]">•</span>
-                      <span className="font-label text-[10px] md:text-[9px] uppercase tracking-widest text-stone-600">08 MIN READ</span>
+                    <div className="space-y-4 md:space-y-0">
+                      <div className="flex items-center gap-4 mb-2">
+                        <span className="font-label uppercase tracking-widest text-[10px] md:text-[9px] text-primary">{post.category}</span>
+                        <span className="text-stone-600 text-[10px]">•</span>
+                        <span className="font-label text-[10px] md:text-[9px] uppercase tracking-widest text-stone-600">ARCHIVE INSIGHT</span>
+                      </div>
+                      <h3 className="font-headline text-3xl md:text-2xl font-bold md:font-light text-white mb-4 group-hover:text-primary transition-colors leading-tight">{post.title}</h3>
+                      <p className="font-body font-extralight text-stone-400 text-sm mb-6 leading-relaxed line-clamp-3 italic">{post.excerpt}</p>
+                      <div className="h-[1px] w-8 bg-stone-800 mb-4 group-hover:w-full transition-all duration-700"></div>
+                      <span className="font-label uppercase tracking-widest text-[9px] text-stone-600">
+                        {post.timestamp?.toDate().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
+                      </span>
                     </div>
-                    <h3 className="font-headline text-3xl md:text-2xl font-bold md:font-light text-white mb-4 group-hover:text-primary transition-colors leading-tight">{post.title}</h3>
-                    <p className="font-body font-extralight text-stone-400 text-sm mb-6 leading-relaxed line-clamp-3">{post.excerpt}</p>
-                    <div className="h-[1px] w-8 bg-stone-800 mb-4 group-hover:w-full transition-all duration-700"></div>
-                    <span className="font-label uppercase tracking-widest text-[9px] text-stone-600">
-                      {post.timestamp?.toDate().toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}
-                    </span>
-                  </div>
-                </article>
+                  </article>
+                </Link>
               ))}
             </div>
           )}
@@ -146,35 +151,36 @@ const Blog = () => {
                <div className="p-6 text-stone-600 font-label uppercase tracking-widest text-[10px]">No active forums at this moment.</div>
             ) : (
               events.map((event) => (
-                <div key={event.id} className="group p-6 md:py-12 md:px-4 flex flex-col md:grid md:grid-cols-12 md:items-center gap-6 md:gap-8 border-b border-stone-800/50 hover:bg-surface-container transition-colors text-left">
-                  <div className="flex justify-between items-start md:col-span-2">
-                    <div className="flex flex-col">
-                      <span className="font-headline text-4xl md:text-3xl font-bold text-white leading-none">{event.date.split(' ')[0]}</span>
-                      <span className="font-label text-[10px] md:text-[11px] uppercase tracking-widest text-stone-500 mt-1">{event.date.split(' ')[1]}</span>
+                <Link key={event.id} to={`/event/${event.id}`} className="group block">
+                  <div className="p-6 md:py-12 md:px-4 flex flex-col md:grid md:grid-cols-12 md:items-center gap-6 md:gap-8 border-b border-stone-800/50 hover:bg-surface-container transition-all text-left">
+                    <div className="flex justify-between items-start md:col-span-2">
+                      <div className="flex flex-col">
+                        <span className="font-headline text-4xl md:text-3xl font-bold text-white leading-none">{event.date.split(' ')[0]}</span>
+                        <span className="font-label text-[10px] md:text-[11px] uppercase tracking-widest text-stone-500 mt-1">{event.date.split(' ')[1]}</span>
+                      </div>
+                      <div className="md:hidden text-right">
+                        <span className="font-label text-[10px] uppercase tracking-widest text-primary block mb-1">Assembly</span>
+                        <span className="text-stone-500 text-xs font-light">{event.location}</span>
+                      </div>
                     </div>
-                    <div className="md:hidden text-right">
-                      <span className="font-label text-[10px] uppercase tracking-widest text-primary block mb-1">Assembly</span>
-                      <span className="text-stone-500 text-xs font-light">{event.location}</span>
+                    
+                    <div className="md:col-span-6">
+                      <h4 className="font-headline text-2xl font-bold md:font-light text-white group-hover:text-primary transition-colors leading-tight">{event.title}</h4>
+                      <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest mt-2 md:mt-1 hidden md:block">{event.location}</p>
+                      <p className="md:hidden font-body text-sm text-stone-500 font-light mt-3 leading-relaxed italic">{event.venue}</p>
+                    </div>
+
+                    <div className="hidden md:block md:col-span-2">
+                      <span className="text-secondary font-label text-[10px] uppercase tracking-widest">{event.venue}</span>
+                    </div>
+
+                    <div className="md:col-span-2 flex gap-4 md:block text-right w-full">
+                      <div className={`flex-1 md:w-auto px-6 py-4 md:py-2 text-[10px] font-label font-bold md:font-normal uppercase tracking-widest transition-all text-center ${event.isPrimary ? 'bg-primary-container text-white' : 'border border-outline-variant/30 text-white group-hover:bg-white group-hover:text-black'}`}>
+                        {event.isPrimary ? 'Attend' : 'Learn More'}
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="md:col-span-6">
-                    <h4 className="font-headline text-2xl font-bold md:font-light text-white group-hover:text-primary transition-colors leading-tight">{event.title}</h4>
-                    <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest mt-2 md:mt-1 hidden md:block">{event.location}</p>
-                    <p className="md:hidden font-body text-sm text-stone-500 font-light mt-3 leading-relaxed">{event.venue}</p>
-                  </div>
-
-                  <div className="hidden md:block md:col-span-2">
-                    <span className="text-secondary font-label text-[10px] uppercase tracking-widest">{event.venue}</span>
-                  </div>
-
-                  <div className="md:col-span-2 flex gap-4 md:block text-right w-full">
-                    <button className={`flex-1 md:w-auto px-6 py-4 md:py-2 text-[10px] font-label font-bold md:font-normal uppercase tracking-widest transition-all ${event.isPrimary ? 'bg-primary-container text-white hover:bg-neutral-800' : 'bg-primary-container md:bg-transparent text-white md:text-white border border-outline-variant/30 hover:bg-white hover:text-black'}`}>
-                      {event.isPrimary ? 'Register' : 'Inquire'}
-                    </button>
-                    <button className="flex-1 md:hidden border border-outline-variant/20 text-white py-4 font-label uppercase tracking-widest text-[10px]">Learn More</button>
-                  </div>
-                </div>
+                </Link>
               ))
             )}
           </div>
