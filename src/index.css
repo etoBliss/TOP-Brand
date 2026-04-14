@@ -1,0 +1,86 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Manrope:wght@200..800&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-on-tertiary: #31302f;
+  --color-on-secondary: #3d2e00;
+  --color-background: #141313;
+  --color-surface-container-low: #1c1b1b;
+  --color-secondary: #edc13b;
+  --color-surface-container: #201f1f;
+  --color-surface: #141313;
+  --color-tertiary-fixed: #e5e2df;
+  --color-primary-fixed: #ffdad4;
+  --color-error-container: #93000a;
+  --color-on-background: #e6e1e1;
+  --color-on-secondary-fixed: #241a00;
+  --color-inverse-primary: #b72210;
+  --color-surface-variant: #363434;
+  --color-surface-bright: #3a3939;
+  --color-on-primary-fixed-variant: #910900;
+  --color-on-surface-variant: #e4beb7;
+  --color-secondary-fixed: #ffe08e;
+  --color-on-error: #690005;
+  --color-inverse-on-surface: #313030;
+  --color-on-primary: #670500;
+  --color-tertiary: #c9c6c3;
+  --color-inverse-surface: #e6e1e1;
+  --color-secondary-container: #bb9400;
+  --color-on-tertiary-fixed-variant: #484745;
+  --color-on-primary-fixed: #400200;
+  --color-surface-tint: #ffb4a7;
+  --color-primary: #ffb4a7;
+  --color-outline-variant: #5b403c;
+  --color-surface-container-high: #2b2a2a;
+  --color-outline: #ab8983;
+  --color-on-error-container: #ffdad6;
+  --color-surface-container-highest: #363434;
+  --color-primary-fixed-dim: #ffb4a7;
+  --color-tertiary-fixed-dim: #c9c6c3;
+  --color-tertiary-container: #4e4d4b;
+  --color-error: #ffb4ab;
+  --color-on-secondary-container: #3e2f00;
+  --color-on-secondary-fixed-variant: #584400;
+  --color-secondary-fixed-dim: #edc13b;
+  --color-on-primary-container: #ffa99a;
+  --color-on-tertiary-fixed: #1c1b1a;
+  --color-surface-dim: #141313;
+  --color-surface-container-lowest: #0f0e0e;
+  --color-primary-container: #9e0b00;
+  --color-on-surface: #e6e1e1;
+  --color-on-tertiary-container: #c1bebb;
+
+  --font-headline: "Noto Serif", serif;
+  --font-body: "Manrope", sans-serif;
+  --font-label: "Manrope", sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  @apply bg-background text-on-background font-body selection:bg-primary-container selection:text-on-primary-container antialiased;
+}
+
+.text-glow {
+  text-shadow: 0 0 20px rgba(255, 180, 167, 0.2);
+}
+
+.grain-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.editorial-accent {
+  width: 4px;
+  background-color: #9e0b00; /* primary-container */
+}

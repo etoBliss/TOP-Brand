@@ -1,0 +1,82 @@
+import { useState, useEffect } from 'react';
+import { db } from '../lib/firebase';
+import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { ArrowRight, Calendar, MapPin, Ticket } from 'lucide-react';
+
+const Events = () => {
+  const [events, setEvents] = useState([]);
+
+  useEffect(() => {
+    const unsub = onSnapshot(query(collection(db, 'events'), orderBy('timestamp', 'asc')), (snapshot) => {
+      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsub();
+  }, []);
+
+  return (
+    <main className="pt-32 pb-24">
+      <div className="grain-overlay" />
+      
+      {/* Hero Section */}
+      <section className="px-8 md:px-16 mb-32">
+        <span className="font-label uppercase tracking-[0.4em] text-[10px] text-secondary mb-6 block">Global Forums</span>
+        <h1 className="font-headline text-6xl md:text-9xl font-light tracking-tighter leading-none text-white italic">
+          Speaking <br /> <span className="not-italic text-primary-fixed-dim">Engagements</span>
+        </h1>
+      </section>
+
+      {/* Events List */}
+      <section className="py-12 px-8 md:px-16">
+        <div className="max-w-6xl mx-auto space-y-1">
+          {events.map((event, idx) => (
+            <div key={idx} className="group py-16 flex flex-col md:grid md:grid-cols-12 items-center gap-12 border-t border-stone-800 hover:bg-stone-900 transition-colors px-6">
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-3 mb-2">
+                  <Calendar className="w-4 h-4 text-stone-600" />
+                  <span className="font-label text-stone-500 text-[11px] uppercase tracking-widest">{event.date}</span>
+                </div>
+              </div>
+              <div className="md:col-span-6">
+                <h4 className="font-headline text-3xl font-light text-white group-hover:text-primary transition-colors mb-2">{event.title}</h4>
+                <div className="flex items-center gap-3">
+                  <MapPin className="w-3 h-3 text-stone-600" />
+                  <p className="font-label text-stone-600 text-[10px] uppercase tracking-widest">{event.location}</p>
+                </div>
+              </div>
+              <div className="md:col-span-2">
+                <div className="flex items-center gap-3">
+                  <Ticket className="w-3 h-3 text-secondary/50" />
+                  <span className="text-secondary font-label text-[10px] uppercase tracking-widest">{event.venue}</span>
+                </div>
+              </div>
+              <div className="md:col-span-2 text-right w-full">
+                <button className={`w-full group/btn flex items-center justify-between px-6 py-3 text-[10px] font-label uppercase tracking-widest transition-all ${event.isPrimary ? 'bg-primary-container text-white hover:bg-red-700' : 'border border-outline-variant/30 text-white hover:bg-white hover:text-black'}`}>
+                  {event.action}
+                  <ArrowRight className="w-3 h-3 transition-transform group-hover/btn:translate-x-1" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Special CTA for Booking */}
+      <section className="mt-32 px-8 md:px-16 pb-24">
+        <div className="max-w-4xl mx-auto bg-surface-container-high p-16 md:p-24 relative overflow-hidden group">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary-container/5 rounded-full blur-3xl -translate-y-12 translate-x-12"></div>
+          <div className="relative z-10">
+            <h2 className="font-headline text-4xl md:text-5xl text-white mb-8">Host a Masterclass</h2>
+            <p className="font-body font-extralight text-stone-400 text-lg mb-12 max-w-xl">
+              Bring the philosophy of architectural curation to your organization. Custom workshops designed for creative leadership and design excellence.
+            </p>
+            <button className="bg-white text-black px-12 py-4 font-label uppercase tracking-widest text-xs font-bold hover:bg-stone-200 transition-all active:scale-95">
+              Request Brochure
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+};
+
+export default Events;
