@@ -264,8 +264,7 @@ const Admin = () => {
       <header className="fixed top-0 left-0 w-full z-40 bg-stone-950/60 backdrop-blur-xl border-b border-stone-800/30 md:hidden">
         <div className="flex justify-between items-center px-6 py-5">
           <div className="flex items-center gap-3">
-            <Menu className="text-secondary w-5 h-5" />
-            <span className="text-xl font-black tracking-tighter text-white font-headline">TOP</span>
+            <span className="text-xl font-black tracking-tighter text-white font-headline border-l-2 border-secondary pl-3">TOP</span>
           </div>
           <div className="flex items-center gap-4">
             <div className="w-8 h-8 bg-stone-800 flex items-center justify-center overflow-hidden ring-1 ring-white/10">
