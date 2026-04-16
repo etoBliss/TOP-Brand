@@ -17,18 +17,37 @@ const Connect = () => {
     name: '',
     email: '',
     service: '',
-    message: ''
+    message: '',
+    website: '' // Honeypot field
   });
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [lastSubmit, setLastSubmit] = useState(0);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // 1. Honeypot check
+    if (formData.website) {
+        console.warn('Bot detected via honeypot.');
+        setStatus('success'); // Silently fail to confuse the bot
+        return;
+    }
+
+    // 2. Simple Throttle (30s)
+    const now = Date.now();
+    if (now - lastSubmit < 30000) {
+        alert('Strategic transmission in progress. Please wait before re-initiating.');
+        return;
+    }
+
     setStatus('loading');
+    setLastSubmit(now);
     console.log('Attempting to transmit vision to Firestore...');
     
     try {
+      const { website, ...cleanData } = formData;
       const docRef = await addDoc(collection(db, 'inquiries'), {
-        ...formData,
+        ...cleanData,
         source: 'Connect Page',
         timestamp: serverTimestamp()
       });
@@ -49,7 +68,7 @@ const Connect = () => {
       );
 
       setStatus('success');
-      setFormData({ name: '', email: '', service: '', message: '' });
+      setFormData({ name: '', email: '', service: '', message: '', website: '' });
     } catch (err) {
       console.error('Transmission failed:', err);
       setStatus('error');
@@ -110,6 +129,18 @@ const Connect = () => {
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-10">
+                {/* Honeypot field - hidden from users */}
+                <div style={{ display: 'none' }} aria-hidden="true">
+                  <input 
+                    type="text" 
+                    name="website" 
+                    tabIndex="-1" 
+                    autoComplete="off"
+                    value={formData.website}
+                    onChange={(e) => setFormData({...formData, website: e.target.value})}
+                  />
+                </div>
+                
                 <div className="relative">
                   <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Identity (Name)</label>
                   <input 
@@ -129,6 +160,9 @@ const Connect = () => {
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
+                  {formData.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && (
+                    <span className="text-[8px] text-error-container mt-1 block uppercase tracking-widest font-bold">Invalid Email Signature</span>
+                  )}
                 </div>
                 <div className="relative">
                   <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Engagement Type</label>
@@ -158,7 +192,7 @@ const Connect = () => {
                   ></textarea>
                 </div>
                 <button 
-                  disabled={status === 'loading'}
+                  disabled={status === 'loading' || !formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)}
                   className="bg-primary-container text-on-primary-container py-6 px-8 text-[12px] uppercase tracking-[0.3em] font-bold text-center hover:bg-on-primary-fixed-variant transition-colors duration-400 group flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.99]" 
                   type="submit"
                 >
@@ -209,6 +243,7 @@ const Connect = () => {
               alt="Minimal Detail" 
               className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000 grayscale opacity-40 group-hover:opacity-100" 
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuChCn6oVEtmyzLKhFKLI9DZp-8GWkyvuvU1MLk_-ez11vIrHTZ9knDM12WlDLNarMMLrcrX1DhPi4-5isCUuE36VkNZk1cDYYoP7AUnwq0ij2rH4igqnXuKHW4vMywxE3AdmWdcJxJxMCASMD0lqeHLicSkQxFikwI4h3DHRqC-kSjZRBAyDDkZ25g1FFyCGcY5dksj_VEs9QLp7eMvD41c-adqroeMEyBnMsz4kEbrU9zJ6ChSao4vu88C1huHMsdDZMiN2EFPqpI"
+              loading="lazy"
             />
             <div className="absolute bottom-6 left-6">
               <span className="text-[10px] uppercase tracking-widest text-secondary">001. Form</span>
@@ -219,6 +254,7 @@ const Connect = () => {
               alt="Studio Space" 
               className="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000 grayscale opacity-40 group-hover:opacity-100" 
               src="https://lh3.googleusercontent.com/aida-public/AB6AXuB6I1LSjpjjuR53Db7bpmZ5IWLbC8EqfzbQHeUUjFCPZUiZjz4ExYYz5EfVtFqLZjGWelu4jJylZhSou5uVgwttluSXzbj3Xbpn0orQ13frfWqnV6xRwSkRTd7SzafQa92ipqdKjpLcJJEyY9BpxLayVF0em2wpkjOFC861Wiqz70tTzagyQ9RCgLCxOyWWCO1n9Tfw9_EfK8Q62Ay1aUmWew-Y2ymXIB2U_agASGGZmUz0qlx3EVSd8YwzcxQw2NvgQWGkRzurJwQ"
+              loading="lazy"
             />
             <div className="absolute bottom-6 left-6">
               <span className="text-[10px] uppercase tracking-widest text-secondary">002. Space</span>

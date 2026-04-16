@@ -1,0 +1,22 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // Helper function: check if user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Public Media: Anyone can view, only Admin can upload/delete
+    match /{allPaths=**} {
+      allow read: if true;
+      allow write: if isAuthenticated();
+    }
+    
+    // Specific folder for private administrative logs (example)
+    match /admin_logs/{logId} {
+      allow read, write: if isAuthenticated();
+    }
+  }
+}

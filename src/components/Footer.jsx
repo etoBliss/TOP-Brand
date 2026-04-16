@@ -62,8 +62,13 @@ const Footer = () => {
         </a>
       </div>
 
-      <div className="font-body font-extralight tracking-widest text-[9px] md:text-[11px] uppercase text-stone-700 md:text-stone-600 text-center md:text-right">
-        © 2026 THE OLUWADOLAPO POPOOLA. <br className="md:hidden" /> ALL RIGHTS RESERVED.
+      <div className="flex flex-col items-center md:items-end gap-2">
+        <div className="font-body font-extralight tracking-widest text-[9px] md:text-[11px] uppercase text-stone-700 md:text-stone-600 text-center md:text-right">
+          © 2026 THE OLUWADOLAPO POPOOLA. <br className="md:hidden" /> ALL RIGHTS RESERVED.
+        </div>
+        <div className="text-[8px] md:text-[9px] uppercase tracking-[0.2em] text-stone-700">
+          developed by <a href="https://etobliss.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-bold text-white hover:text-stone-300 transition-colors">etoBliss<span style={{ color: '#b49cf5' }}>.</span></a>
+        </div>
       </div>
     </footer>
   );

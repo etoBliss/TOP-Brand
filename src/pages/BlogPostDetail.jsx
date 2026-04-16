@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, Clock, Share2 } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const BlogPostDetail = () => {
   const { id } = useParams();
@@ -43,6 +44,13 @@ const BlogPostDetail = () => {
 
   return (
     <div className="min-h-screen bg-stone-950 text-white pb-32 pt-24 md:pt-28">
+      <SEO 
+        title={blog.title} 
+        description={blog.excerpt} 
+        image={blog.imageUrl} 
+        article={true}
+        path={`/blog/${blog.id}`}
+      />
        {/* Hero Section */}
        <div className="relative h-[65vh] overflow-hidden">
           {blog.imageUrl ? (

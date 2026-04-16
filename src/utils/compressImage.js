@@ -42,6 +42,11 @@ export const compressImage = async (file, { maxWidth = 1920, maxHeight = 1080, q
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
 
+      // Determine output format (WebP prioritized for efficiency)
+      const outputFormat = 'image/webp';
+      const fallbackFormat = 'image/jpeg';
+      const outputExtension = file.name.split('.').pop().toLowerCase() === 'png' ? 'webp' : 'webp';
+
       // Convert to blob
       canvas.toBlob(
         (blob) => {
@@ -49,18 +54,19 @@ export const compressImage = async (file, { maxWidth = 1920, maxHeight = 1080, q
             return reject(new Error('Canvas to Blob conversion failed'));
           }
           // Create a new file from the blob
-          const optimizedFile = new File([blob], file.name, {
-            type: 'image/jpeg',
+          // We keep the original filename but we could also change extension
+          const optimizedFile = new File([blob], file.name.replace(/\.[^/.]+$/, "") + ".webp", {
+            type: outputFormat,
             lastModified: Date.now(),
           });
           
           // Log the compression result for debugging
           console.log(`Original size: ${(file.size / 1024 / 1024).toFixed(2)} MB`);
-          console.log(`Optimized size: ${(optimizedFile.size / 1024 / 1024).toFixed(2)} MB`);
+          console.log(`Optimized size: ${(optimizedFile.size / 1024 / 1024).toFixed(2)} MB (${outputFormat})`);
           
           resolve(optimizedFile);
         },
-        'image/jpeg',
+        outputFormat,
         quality
       );
     };

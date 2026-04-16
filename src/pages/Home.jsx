@@ -1,20 +1,33 @@
 import { ArrowRight, Box, Share2, Layers, Home as HomeIcon, Building2, BookOpen, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import heroImage from '../assets/1a 1.svg';
+import SEO from '../components/SEO';
 
 const Home = () => {
   return (
     <div className="min-h-screen overflow-x-hidden">
+      <SEO 
+        title="Home" 
+        description="Building people, brands, and systems with clarity and precision."
+        path="/"
+      />
       <div className="grain-overlay" />
       
       {/* Hero Section: Overlay on Mobile, Split on Desktop */}
       <section className="relative min-h-screen md:min-h-[921px] flex flex-col justify-end md:grid md:grid-cols-2 overflow-hidden">
         {/* Mobile Background / Desktop Image Side */}
-        <div className="absolute inset-0 md:relative md:translate-y-0 h-full w-full order-1 md:order-2 bg-surface-container-low overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
+          className="absolute inset-0 md:relative md:translate-y-0 h-full w-full order-1 md:order-2 bg-surface-container-low overflow-hidden"
+        >
           <img 
             alt="Visionary Leader" 
             className="w-full h-full object-cover grayscale brightness-50 md:brightness-100 contrast-125 md:contrast-100 transition-all duration-1000 ease-in-out" 
             src={heroImage}
+            loading="eager"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent md:bg-gradient-to-r md:from-background"></div>
           
@@ -23,11 +36,16 @@ const Home = () => {
             <p className="font-label text-[10px] uppercase tracking-[0.3em] text-secondary mb-2">TOP</p>
             <p className="font-headline text-lg italic text-white">THE OLUWADOLAPO POPOOLA</p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Content Side: Stacks below image on mobile, overlays slightly if needed */}
         <div className="relative z-10 flex flex-col justify-end md:justify-center px-6 md:px-20 pb-20 md:py-12 order-2 md:order-1 bg-transparent md:bg-surface max-w-sm md:max-w-none">
-          <div className="max-w-xl">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            className="max-w-xl"
+          >
             <span className="font-label text-[10px] uppercase tracking-[0.4em] text-secondary mb-6 md:mb-8 block">Brand Strategist & Systems Thinker</span>
             <h1 className="font-headline text-5xl md:text-7xl lg:text-8xl font-black md:font-light leading-[0.95] md:leading-[1.1] tracking-tighter md:tracking-tight mb-8 md:mb-10 text-white md:text-on-background text-glow">
               Building people, brands, and systems with clarity.
@@ -44,7 +62,7 @@ const Home = () => {
                 <ArrowRight className="text-xl transition-transform group-hover:translate-x-2" />
               </Link>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 

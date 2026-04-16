@@ -1,8 +1,26 @@
 import { Compass, Mic, Radio, Building2, Layers, UserCheck, Network, GraduationCap, ArrowRight, Home as HomeIcon, BookOpen, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import SEO from '../components/SEO';
 
 const Services = () => {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
   const servicesList = [
+    // ... (rest remains same)
     {
       id: "01",
       title: "Brand Strategy",
@@ -63,25 +81,42 @@ const Services = () => {
 
   return (
     <main className="pt-24 md:pt-32 pb-24 px-6 md:px-24 lg:px-32 overflow-x-hidden">
+      <SEO 
+        title="Strategic Disciplines" 
+        description="A disciplined approach to building. Bridging the gap between vision and execution through precision and systems thinking."
+        path="/services"
+      />
       <div className="fixed inset-0 grain-overlay z-[60] pointer-events-none"></div>
       
       {/* Hero Section */}
-      {/* Hero Section */}
       <header className="mb-20 md:mb-24">
-        <p className="font-label font-extralight uppercase tracking-[0.2em] text-[10px] text-secondary mb-4">Systems Thinker & Brand Strategist</p>
-        <h1 className="font-headline text-5xl md:text-8xl lg:text-9xl font-light tracking-tight md:-tracking-[0.04em] leading-none italic mb-8">
-          Strategic <span className="text-secondary md:text-on-surface-variant not-italic">Disciplines</span>
-        </h1>
-        <p className="font-body font-extralight text-on-surface-variant md:text-stone-400 leading-relaxed max-w-sm md:max-w-md text-lg md:text-xl">
-          A disciplined approach to building. Bridging the gap between vision and execution through precision, systems thinking, and intentionality.
-        </p>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <p className="font-label font-extralight uppercase tracking-[0.2em] text-[10px] text-secondary mb-4">Systems Thinker & Brand Strategist</p>
+          <h1 className="font-headline text-5xl md:text-8xl lg:text-9xl font-light tracking-tight md:-tracking-[0.04em] leading-none italic mb-8">
+            Strategic <span className="text-secondary md:text-on-surface-variant not-italic">Disciplines</span>
+          </h1>
+          <p className="font-body font-extralight text-on-surface-variant md:text-stone-400 leading-relaxed max-w-sm md:max-w-md text-lg md:text-xl">
+            A disciplined approach to building. Bridging the gap between vision and execution through precision, systems thinking, and intentionality.
+          </p>
+        </motion.div>
       </header>
 
       {/* Services Grid / Accordion-style on mobile */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px md:gap-px md:bg-stone-800/20 overflow-hidden relative">
+      <motion.section 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, amount: 0.1 }}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px md:gap-px md:bg-stone-800/20 overflow-hidden relative"
+      >
         {servicesList.map((service, index) => (
-          <div 
+          <motion.div 
             key={service.id} 
+            variants={itemVariants}
             className={`group bg-surface-container-low md:${service.bgClass} border-b border-outline-variant/10 md:border-none px-0 md:p-10 flex flex-col justify-between min-h-auto md:min-h-[400px] hover:bg-surface-container-low transition-colors duration-500 cursor-pointer`}
           >
             <div className="flex flex-col md:block">
@@ -132,9 +167,9 @@ const Services = () => {
             <div className="hidden md:block mt-8">
               {service.icon}
             </div>
-          </div>
+          </motion.div>
         ))}
-      </section>
+      </motion.section>
 
       {/* CTA Section */}
       <section className="mt-24 md:mt-32 mb-12">

@@ -1,32 +1,55 @@
 import { Box, Share2, Layers, Diamond, ArrowRight, Home as HomeIcon, Building2, BookOpen, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
 import topImage from "../assets/2a 1.svg"
+import SEO from '../components/SEO';
 
 const About = () => {
   return (
     <main className="pt-24 md:pt-32 pb-24">
+      <SEO 
+        title="About The Blueprint" 
+        description="Rooted in the discipline of medicine and the precision of strategy, TOP represents the singular vision of Oluwadolapo Popoola."
+        path="/about"
+      />
       <div className="fixed inset-0 grain-overlay z-[100]"></div>
       
       {/* Hero Section: Narrative Arc */}
       <section className="px-6 md:px-24 mb-20 md:mb-32 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
-        <div className="md:col-span-8">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          className="md:col-span-8"
+        >
           <span className="font-label text-[10px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-secondary mb-4 md:mb-6 block">The Blueprint</span>
           <h1 className="font-headline text-5xl md:text-9xl font-black md:font-light tracking-tighter leading-[1.1] md:leading-none mb-8">
             The Intersection of <span className="text-secondary italic">Systems</span> & Strategy.
           </h1>
-        </div>
-        <div className="md:col-span-4 pb-4">
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="md:col-span-4 pb-4"
+        >
           <p className="font-body font-extralight text-lg leading-relaxed text-stone-400 border-l border-outline-variant/20 pl-6 md:pl-8 max-w-sm md:max-w-none">
             Rooted in the discipline of medicine and the precision of strategy, TOP represents the singular vision of Oluwadolapo Popoola. I build systems that bridge the gap between vision and results.
           </p>
-        </div>
-        <div className="md:hidden mt-8 relative w-full aspect-[4/5] overflow-hidden">
+        </motion.div>
+        <motion.div 
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2 }}
+          className="md:hidden mt-8 relative w-full aspect-[4/5] overflow-hidden"
+        >
           <img 
             className="w-full h-full object-cover grayscale brightness-75 shadow-2xl" 
             alt="Oluwadolapo Popoola Portrait"
             src={topImage}
+            loading="lazy"
           />
-        </div>
+        </motion.div>
       </section>
 
       {/* Tonal Shift: Soft Ivory Section (Core Values) */}

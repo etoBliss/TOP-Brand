@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, ArrowDown, Calendar, MapPin, Building2, ExternalLink } from 'lucide-react';
+import SEO from '../components/SEO';
 
 const EventDetail = () => {
   const { id } = useParams();
@@ -42,6 +43,12 @@ const EventDetail = () => {
 
   return (
     <div className="min-h-screen bg-stone-950 text-white pb-32 overflow-x-hidden">
+      <SEO 
+        title={event.title} 
+        description={event.description} 
+        image={event.imageUrl} 
+        path={`/event/${event.id}`}
+      />
        {/* Top Hero Banner Section */}
        <div className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden border-b border-white/10 group animate-in fade-in duration-1000">
           <div className="absolute inset-0 bg-stone-950 opacity-40 z-10"></div>

@@ -4,6 +4,8 @@ import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } from 
 import { ArrowRight, Home as HomeIcon, Building2, BookOpen, Mail, Plus } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
+import SEO from '../components/SEO';
+import Skeleton from '../components/Skeleton';
 
 // EmailJS Configuration (Replace with your keys)
 const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
@@ -13,6 +15,7 @@ const EMAILJS_ADMIN_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE_ID
 const Blog = () => {
   const [blogs, setBlogs] = useState([]);
   const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [status, setStatus] = useState('idle');
   const [formData, setFormData] = useState({
     name: '',
@@ -22,13 +25,34 @@ const Blog = () => {
   });
 
   useEffect(() => {
+    let blogsDone = false;
+    let eventsDone = false;
+
+    const checkLoading = () => {
+      if (blogsDone && eventsDone) {
+        setLoading(false);
+      }
+    };
+
     const unsubBlogs = onSnapshot(query(collection(db, 'blogs'), orderBy('timestamp', 'desc')), (snapshot) => {
       setBlogs(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      blogsDone = true;
+      checkLoading();
+    }, (error) => {
+      console.error("Blogs fetch error:", error);
+      blogsDone = true;
+      checkLoading();
     });
 
     const unsubEvents = onSnapshot(query(collection(db, 'events'), orderBy('timestamp', 'desc')), (snapshot) => {
       const allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
       setEvents(allEvents.filter(e => !e.isPast));
+      eventsDone = true;
+      checkLoading();
+    }, (error) => {
+      console.error("Events fetch error:", error);
+      eventsDone = true;
+      checkLoading();
     });
 
     return () => {
@@ -75,6 +99,11 @@ const Blog = () => {
 
   return (
     <main className="pt-24 md:pt-32 pb-32">
+      <SEO 
+        title="Insights & Events" 
+        description="An architectural curation of thoughts on minimalist heritage and the upcoming assemblies of the creative vanguard."
+        path="/blog"
+      />
       <div className="fixed inset-0 grain-overlay z-[100] pointer-events-none opacity-[0.03]"></div>
       
       {/* Hero Section: Editorial Scale */}
@@ -100,7 +129,20 @@ const Blog = () => {
         </div>
 
         <div className="max-w-7xl mx-auto">
-          {blogs.length === 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-16">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="space-y-6">
+                  <Skeleton height="250px" width="100%" />
+                  <div className="space-y-3">
+                    <Skeleton height="12px" width="40%" />
+                    <Skeleton height="32px" width="90%" />
+                    <Skeleton height="60px" width="100%" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : blogs.length === 0 ? (
              <div className="py-24 border-t border-stone-800 text-stone-500 font-body italic">
                 Archives are currently being curated. Await fresh insights.
              </div>
@@ -112,7 +154,7 @@ const Blog = () => {
                     <div className="aspect-[4/5] md:aspect-video w-full overflow-hidden mb-6 md:mb-4 bg-surface-container-low">
                       <div className="w-full h-full bg-surface-container-high group-hover:bg-primary-container/10 transition-all duration-700 flex items-center justify-center relative">
                          {post.imageUrl ? (
-                           <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity" />
+                           <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover opacity-50 group-hover:opacity-80 transition-opacity" loading="lazy" />
                          ) : (
                            <span className="font-headline text-stone-800 text-5xl md:text-6xl italic group-hover:scale-110 transition-transform duration-700">{post.title.charAt(0)}</span>
                          )}
@@ -150,7 +192,16 @@ const Blog = () => {
 
         <div className="max-w-6xl mx-auto">
           <div className="space-y-0 border-t border-stone-800/50">
-            {events.length === 0 ? (
+            {loading ? (
+              [1, 2, 3].map((i) => (
+                <div key={i} className="p-6 md:py-12 md:px-4 grid grid-cols-1 md:grid-cols-12 items-center gap-6 border-b border-stone-800/50">
+                  <div className="md:col-span-2"><Skeleton height="40px" width="60px" /></div>
+                  <div className="md:col-span-6"><Skeleton height="30px" width="80%" /></div>
+                  <div className="md:col-span-2"><Skeleton height="20px" width="100px" /></div>
+                  <div className="md:col-span-2"><Skeleton height="40px" width="100%" /></div>
+                </div>
+              ))
+            ) : events.length === 0 ? (
                <div className="p-6 text-stone-600 font-label uppercase tracking-widest text-[10px]">No active forums at this moment.</div>
             ) : (
               events.map((event) => (
