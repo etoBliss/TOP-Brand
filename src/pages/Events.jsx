@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { ArrowRight, Calendar, MapPin, Ticket } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin, Ticket, Building2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Events = () => {
@@ -9,21 +9,24 @@ const Events = () => {
 
   useEffect(() => {
     const unsub = onSnapshot(query(collection(db, 'events'), orderBy('timestamp', 'asc')), (snapshot) => {
-      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEvents(allEvents.filter(e => !e.isPast));
     });
     return () => unsub();
   }, []);
 
   return (
-    <main className="pt-32 pb-24">
+    <main className="pt-32 pb-24 overflow-x-hidden">
       <div className="grain-overlay" />
       
       {/* Hero Section */}
-      <section className="px-8 md:px-16 mb-32">
-        <span className="font-label uppercase tracking-[0.4em] text-[10px] text-secondary mb-6 block">Global Forums</span>
-        <h1 className="font-headline text-6xl md:text-9xl font-light tracking-tighter leading-none text-white italic">
-          Speaking <br /> <span className="not-italic text-primary-fixed-dim">Engagements</span>
-        </h1>
+      <section className="px-8 md:px-16 mb-24 flex justify-between items-end">
+        <div>
+          <span className="font-label uppercase tracking-[0.4em] text-[10px] text-secondary mb-6 block">Global Forums</span>
+          <h1 className="font-headline text-5xl md:text-9xl font-light tracking-tighter leading-none text-white italic break-words">
+            Speaking <br /> <span className="not-italic text-primary-fixed-dim">Engagements</span>
+          </h1>
+        </div>
       </section>
 
       {/* Events List */}
@@ -78,6 +81,25 @@ const Events = () => {
           </div>
         </div>
       </section>
+      {/* Mobile Bottom Nav */}
+      <nav className="fixed bottom-0 left-0 w-full bg-stone-950/80 backdrop-blur-xl md:hidden flex justify-around items-center py-4 px-6 z-50 border-t border-white/5 pb-2">
+        <Link to="/" className="flex flex-col items-center text-stone-500">
+          <HomeIcon className="w-5 h-5 mb-1" />
+          <span className="text-[8px] font-label uppercase tracking-tighter">Home</span>
+        </Link>
+        <Link to="/services" className="flex flex-col items-center text-stone-500">
+          <Building2 className="w-5 h-5 mb-1" />
+          <span className="text-[8px] font-label uppercase tracking-tighter">Services</span>
+        </Link>
+        <Link to="/blog" className="flex flex-col items-center text-stone-500">
+          <BookOpen className="w-5 h-5 mb-1" />
+          <span className="text-[8px] font-label uppercase tracking-tighter">Insights</span>
+        </Link>
+        <Link to="/connect" className="flex flex-col items-center text-stone-500">
+          <Mail className="w-5 h-5 mb-1" />
+          <span className="text-[8px] font-label uppercase tracking-tighter">Connect</span>
+        </Link>
+      </nav>
     </main>
   );
 };

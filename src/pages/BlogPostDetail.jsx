@@ -36,8 +36,8 @@ const BlogPostDetail = () => {
 
   if (!blog) return (
     <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-white p-6">
-      <h2 className="font-headline text-3xl mb-4 italic text-stone-400">Insight artifact not found.</h2>
-      <Link to="/blog" className="text-primary font-label uppercase tracking-widest text-[10px] border border-primary/20 px-6 py-3 hover:bg-primary/5 transition-all">Return to Archive</Link>
+      <h2 className="font-headline text-3xl mb-4 italic text-stone-400">Strategic artifact not found.</h2>
+      <Link to="/blog" className="text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all">Return to Global Forum</Link>
     </div>
   );
 
@@ -97,7 +97,7 @@ const BlogPostDetail = () => {
                          className="flex items-center gap-3 text-stone-400 hover:text-white transition-all font-label uppercase text-[10px] tracking-widest group"
                       >
                          <Share2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                         {copied ? <span className="text-secondary">Link Copied!</span> : 'Disseminate Insight'}
+                         {copied ? <span className="text-secondary">Signature Copied!</span> : 'Disseminate Intelligence'}
                       </button>
                     </div>
                 </div>
@@ -113,12 +113,20 @@ const BlogPostDetail = () => {
                 </article>
                 
                 <div className="mt-32 pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
-                   <div className="text-[10px] font-label uppercase tracking-widest text-stone-600 italic">End of Artifact Structure</div>
-                   <Link to="/connect" className="font-label uppercase tracking-[0.2em] text-[10px] text-white hover:text-primary transition-colors">Request Deep Inquiry →</Link>
+                   <div className="text-[10px] font-label uppercase tracking-widest text-stone-600 italic">End of Tactical Brief</div>
+                   <Link to="/connect" className="font-label uppercase tracking-[0.2em] text-[10px] text-white hover:text-secondary transition-colors">Initiate Strategic Advisory →</Link>
                 </div>
              </div>
           </div>
-       </div>
+        </div>
+
+        {/* Mobile Detail Nav */}
+        <nav className="fixed bottom-0 left-0 w-full bg-stone-950/80 backdrop-blur-xl md:hidden flex justify-center items-center py-5 px-6 z-50 border-t border-white/5">
+          <Link to="/blog" className="flex items-center gap-3 text-white font-label uppercase tracking-[0.2em] text-[10px]">
+            <ArrowLeft className="w-4 h-4 text-secondary" />
+            Back to Global Insights
+          </Link>
+        </nav>
     </div>
   );
 };

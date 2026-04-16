@@ -1,4 +1,11 @@
 {
+    "redirects": [
+        {
+            "source": "/past-events",
+            "destination": "/events",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",

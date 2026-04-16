@@ -27,7 +27,8 @@ const Blog = () => {
     });
 
     const unsubEvents = onSnapshot(query(collection(db, 'events'), orderBy('timestamp', 'desc')), (snapshot) => {
-      setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+      const allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      setEvents(allEvents.filter(e => !e.isPast));
     });
 
     return () => {
@@ -140,9 +141,11 @@ const Blog = () => {
 
       {/* Chronological Events List: Stacked on mobile */}
       <section className="bg-surface-container-low py-20 px-0 md:px-16 relative z-10 transition-all">
-        <div className="px-6 max-w-6xl mx-auto mb-12">
-          <h2 className="font-label text-[10px] uppercase tracking-[0.2em] text-secondary mb-2">Upcoming Assemblies</h2>
-          <h3 className="font-headline text-4xl md:text-5xl font-black md:font-light italic text-white">CALENDAR</h3>
+        <div className="px-6 max-w-6xl mx-auto mb-12 flex justify-between items-end">
+          <div>
+            <h2 className="font-label text-[10px] uppercase tracking-[0.2em] text-secondary mb-2">Upcoming Assemblies</h2>
+            <h3 className="font-headline text-4xl md:text-5xl font-black md:font-light italic text-white">CALENDAR</h3>
+          </div>
         </div>
 
         <div className="max-w-6xl mx-auto">

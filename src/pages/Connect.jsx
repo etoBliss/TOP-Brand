@@ -71,7 +71,7 @@ const Connect = () => {
       {/* Hero Section: Architectural Narrative */}
       <section className="pt-32 md:pt-48 pb-16 md:pb-32 px-6 md:px-16 lg:px-24 mx-auto w-full">
         <div className="max-w-7xl mx-auto">
-          <p className="text-[10px] uppercase tracking-[0.4em] text-secondary font-semibold mb-6">Available for Collaboration</p>
+          <p className="text-[10px] uppercase tracking-[0.4em] text-secondary font-semibold mb-6">Strategic Partnership</p>
           <h1 className="font-headline text-6xl md:text-8xl lg:text-[10rem] font-bold tracking-tighter text-neutral-100 leading-[0.85] mb-12 italic">
             Let’s Build <br /><span className="not-italic text-on-surface-variant">Together</span>
           </h1>
@@ -81,13 +81,13 @@ const Connect = () => {
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 md:w-20 md:h-20 overflow-hidden bg-surface-container grayscale hover:grayscale-0 transition-all duration-700 ring-1 ring-white/10">
               <img 
-                alt="The Curator" 
+                alt="Oluwadolapo Popoola" 
                 className="w-full h-full object-cover" 
                 src={curator}
               />
             </div>
             <div>
-              <p className="font-headline text-xl md:text-2xl font-bold text-neutral-100">The Curator</p>
+              <p className="font-headline text-xl md:text-2xl font-bold text-neutral-100">Oluwadolapo Popoola</p>
               <p className="text-sm text-neutral-500 tracking-tight font-body">@thatspace_boy</p>
             </div>
           </div>
@@ -103,14 +103,14 @@ const Connect = () => {
                 <div className="w-16 h-16 bg-primary-container/20 flex items-center justify-center mx-auto">
                   <ArrowRight className="text-primary -rotate-45" />
                 </div>
-                <h3 className="font-headline text-2xl md:text-3xl">Vision Transmitted.</h3>
-                <p className="font-body text-stone-400">We will respond shortly to curate your digital space.</p>
-                <button onClick={() => setStatus('idle')} className="text-[10px] uppercase tracking-widest text-secondary border-b border-secondary/20 hover:text-white transition-colors">Send another inquiry</button>
+                <h3 className="font-headline text-2xl md:text-3xl">Transmission Successful.</h3>
+                <p className="font-body text-stone-400">I will respond shortly to review your strategic vision.</p>
+                <button onClick={() => setStatus('idle')} className="text-[10px] uppercase tracking-widest text-secondary border-b border-secondary/20 hover:text-white transition-colors">Submit another inquiry</button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="flex flex-col gap-10">
                 <div className="relative">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Name</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Identity (Name)</label>
                   <input 
                     className="w-full bg-transparent border-0 border-b border-outline-variant/30 py-4 px-0 text-neutral-100 focus:ring-0 focus:border-secondary transition-colors placeholder:text-neutral-700" 
                     placeholder="Your Full Name" type="text"
@@ -120,35 +120,37 @@ const Connect = () => {
                   />
                 </div>
                 <div className="relative">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Email</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Direct Email</label>
                   <input 
                     className="w-full bg-transparent border-0 border-b border-outline-variant/30 py-4 px-0 text-neutral-100 focus:ring-0 focus:border-secondary transition-colors placeholder:text-neutral-700" 
-                    placeholder="hello@curator.com" type="email"
+                    placeholder="hello@brand.com" type="email"
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
                 </div>
                 <div className="relative">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Inquiry Type</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">Engagement Type</label>
                   <select 
                     className="w-full bg-transparent border-0 border-b border-outline-variant/30 py-4 px-0 text-neutral-100 focus:ring-0 focus:border-secondary transition-colors appearance-none cursor-pointer"
                     required
                     value={formData.service}
                     onChange={(e) => setFormData({...formData, service: e.target.value})}
                   >
-                    <option className="bg-surface" value="" disabled>Select Inquiry Type</option>
-                    <option className="bg-surface" value="Architectural Design">Architectural Design</option>
-                    <option className="bg-surface" value="Digital Curation">Digital Curation</option>
-                    <option className="bg-surface" value="Speaking Engagement">Speaking Engagement</option>
+                    <option className="bg-surface" value="" disabled>Select engagement type</option>
+                    <option className="bg-surface" value="Brand & Business Strategy">Brand & Business Strategy</option>
+                    <option className="bg-surface" value="Personal Brand Consulting">Personal Brand Consulting</option>
+                    <option className="bg-surface" value="Strategic Advisory">Strategic Advisory</option>
+                    <option className="bg-surface" value="Public Speaking">Public Speaking</option>
+                    <option className="bg-surface" value="Voice Over Acting">Voice Over Acting</option>
                   </select>
                   <ChevronDown className="absolute right-0 bottom-4 text-neutral-600 w-4 h-4 pointer-events-none" />
                 </div>
                 <div className="relative">
-                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">The Brief</label>
+                  <label className="text-[10px] uppercase tracking-[0.2em] text-neutral-500 font-bold mb-2 block">The Brief (Strategic Vision)</label>
                   <textarea 
                     className="w-full bg-transparent border-0 border-b border-outline-variant/30 py-4 px-0 text-neutral-100 focus:ring-0 focus:border-secondary transition-colors placeholder:text-neutral-700 resize-none" 
-                    placeholder="Tell me about your vision..." rows="4"
+                    placeholder="Describe your current bottleneck or strategic vision..." rows="4"
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({...formData, message: e.target.value})}
@@ -156,10 +158,10 @@ const Connect = () => {
                 </div>
                 <button 
                   disabled={status === 'loading'}
-                  className="bg-primary-container text-on-primary-container py-6 px-8 text-[12px] uppercase tracking-[0.3em] font-bold text-center hover:bg-on-primary-fixed-variant transition-colors duration-400 group flex items-center justify-center gap-3 disabled:opacity-50" 
+                  className="bg-primary-container text-on-primary-container py-6 px-8 text-[12px] uppercase tracking-[0.3em] font-bold text-center hover:bg-on-primary-fixed-variant transition-colors duration-400 group flex items-center justify-center gap-3 disabled:opacity-50 active:scale-[0.99]" 
                   type="submit"
                 >
-                  {status === 'loading' ? 'Transmitting...' : 'Inquire Now'}
+                  {status === 'loading' ? 'Transmitting...' : 'Initiate Transformation'}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </button>
               </form>
@@ -190,7 +192,7 @@ const Connect = () => {
             {/* Aesthetic Quote */}
             <div className="pl-6 border-l-4 border-primary-container py-4">
               <h2 className="font-headline text-3xl font-light text-secondary leading-tight italic">
-                "Design is not what it looks like and feels like. Design is how it works together in the silence of the void."
+                "Top vision. Top strategy. Top execution."
               </h2>
             </div>
           </div>
@@ -226,7 +228,7 @@ const Connect = () => {
 
       {/* Floating Branding Accent */}
       <div className="fixed bottom-12 right-12 z-50 mix-blend-difference hidden lg:block opacity-20 hover:opacity-100 transition-opacity">
-        <p className="text-[10px] uppercase tracking-[1em] vertical-text text-white cursor-default" style={{ writingMode: 'vertical-rl' }}>CURATING PERMANENCE</p>
+        <p className="text-[10px] uppercase tracking-[1em] vertical-text text-white cursor-default" style={{ writingMode: 'vertical-rl' }}>VISION. STRATEGY. EXECUTION.</p>
       </div>
       {/* Mobile Bottom Nav */}
       <nav className="fixed bottom-0 left-0 w-full bg-stone-950/80 backdrop-blur-xl md:hidden flex justify-around items-center py-4 px-6 z-50 border-t border-white/5 pb-2">

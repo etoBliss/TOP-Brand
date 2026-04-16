@@ -15,6 +15,8 @@ import EventDetail from './pages/EventDetail';
 
 import { useLocation } from 'react-router-dom';
 
+
+
 function AppContent() {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin') || location.pathname === '/login';
@@ -28,8 +30,8 @@ function AppContent() {
           <Route path="/about" element={<About />} />
           <Route path="/services" element={<Services />} />
           <Route path="/blog" element={<Blog />} />
-          <Route path="/blog/:id" element={<BlogPostDetail />} />
           <Route path="/events" element={<Events />} />
+          <Route path="/blog/:id" element={<BlogPostDetail />} />
           <Route path="/event/:id" element={<EventDetail />} />
           <Route path="/connect" element={<Connect />} />
           <Route path="/login" element={<Login />} />

@@ -5,6 +5,7 @@ import { collection, query, orderBy, onSnapshot, doc, deleteDoc, updateDoc, addD
 import { useNavigate, Link } from 'react-router-dom';
 import emailjs from '@emailjs/browser';
 import { uploadToCloudinary } from '../lib/uploadToCloudinary';
+import { compressImage } from '../utils/compressImage';
 import curator from '../assets/Frame 5.svg';
 
 // EmailJS Configuration (Replace with your keys)
@@ -55,6 +56,8 @@ const Admin = () => {
   const [blogImagePreview, setBlogImagePreview] = useState(null);
   const [eventImageFile, setEventImageFile] = useState(null);
   const [eventImagePreview, setEventImagePreview] = useState(null);
+  const [galleryPreview, setGalleryPreview] = useState([]);
+  const [speakerImageFiles, setSpeakerImageFiles] = useState({}); // { speakerIdx: File }
   const [uploading, setUploading] = useState(false);
   
   const navigate = useNavigate();
@@ -568,7 +571,7 @@ const Admin = () => {
              <div className="flex justify-between items-center bg-stone-900/40 p-6 border border-stone-800">
               <span className="font-label uppercase tracking-widest text-[10px] text-stone-500">Global Forums: {events.length}</span>
               <button 
-                onClick={() => setShowEventForm({ title: '', location: '', venue: '', date: '', action: 'Register', isPrimary: false, registrationLink: '' })}
+                onClick={() => setShowEventForm({ title: '', location: '', venue: '', date: '', action: 'Register', isPrimary: false, registrationLink: '', speakers: [], description: '' })}
                 className="bg-secondary text-black px-8 py-4 font-label uppercase tracking-widest text-[10px] font-bold hover:bg-yellow-500 transition-all flex items-center gap-3"
               >
                 <Plus className="w-4 h-4" /> Add Forum
@@ -655,12 +658,18 @@ const Admin = () => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
                     let imageUrl = showBlogForm.imageUrl || '';
-                    if (blogImageFile) {
-                      setUploading(true);
-                      try { imageUrl = await uploadToCloudinary(blogImageFile); }
-                      catch { imageUrl = showBlogForm.imageUrl || ''; }
-                      setUploading(false);
-                    }
+                     if (blogImageFile) {
+                       setUploading(true);
+                       try { 
+                         const optimized = await compressImage(blogImageFile);
+                         imageUrl = await uploadToCloudinary(optimized); 
+                       }
+                       catch (err) { 
+                         console.error("Blog image compression/upload failure:", err);
+                         imageUrl = showBlogForm.imageUrl || ''; 
+                       }
+                       setUploading(false);
+                     }
                     saveBlog({
                       ...showBlogForm,
                       title: formData.get('title'),
@@ -732,7 +741,7 @@ const Admin = () => {
                     <h3 className="font-headline text-2xl md:text-4xl text-white italic font-light">{showEventForm.id ? 'Refine Engagement' : 'New Engagement'}</h3>
                     <p className="font-label uppercase tracking-widest text-[9px] text-stone-500 mt-2">Synchronizing global forum</p>
                   </div>
-                  <button onClick={() => setShowEventForm(null)} className="text-stone-600 hover:text-white transition-colors flex-shrink-0 ml-4">
+                  <button onClick={() => { setShowEventForm(null); setEventImageFile(null); setEventImagePreview(null); setGalleryPreview([]); }} className="text-stone-600 hover:text-white transition-colors flex-shrink-0 ml-4">
                     <X className="w-6 h-6" />
                   </button>
                 </div>
@@ -742,23 +751,54 @@ const Admin = () => {
                     e.preventDefault();
                     const formData = new FormData(e.target);
                     let imageUrl = showEventForm.imageUrl || '';
-                    if (eventImageFile) {
-                      setUploading(true);
-                      try { imageUrl = await uploadToCloudinary(eventImageFile); }
-                      catch { imageUrl = showEventForm.imageUrl || ''; }
-                      setUploading(false);
+                    let speakers = [...(showEventForm.speakers || [])];
+                    
+                    setUploading(true);
+                    try {
+                      // 1. Handle single cover image upload
+                      if (eventImageFile) {
+                        const optimized = await compressImage(eventImageFile);
+                        imageUrl = await uploadToCloudinary(optimized);
+                      }
+                      
+                      // 2. Handle speaker image uploads
+                      const speakerUploadPromises = Object.keys(speakerImageFiles).map(async (idx) => {
+                        const file = speakerImageFiles[idx];
+                        if (file) {
+                          const optimized = await compressImage(file);
+                          const url = await uploadToCloudinary(optimized);
+                          speakers[idx] = { ...speakers[idx], imageUrl: url };
+                        }
+                      });
+                      await Promise.all(speakerUploadPromises);
+
+                    } catch (err) {
+                      console.error("Synchronization failure:", err);
+                      setSystemAlert({ title: "Upload Dissonance", message: "Failed to synchronize some vision fragments to the cloud." });
                     }
+                    setUploading(false);
+
+                    // 3. Finalize Speaker Data from Form
+                    const updatedSpeakers = speakers.map((s, idx) => ({
+                      ...s,
+                      name: formData.get(`speaker_name_${idx}`),
+                      role: formData.get(`speaker_role_${idx}`),
+                      bio: formData.get(`speaker_bio_${idx}`)
+                    }));
+
                     saveEvent({
                       ...showEventForm,
                       title: formData.get('title'),
                       date: formData.get('date'),
                       location: formData.get('location'),
                       venue: formData.get('venue'),
+                      description: formData.get('description'),
                       isPrimary: formData.get('isPrimary') === 'on',
                       registrationLink: formData.get('registrationLink'),
-                      imageUrl
+                      imageUrl,
+                      speakers: updatedSpeakers
                     });
-                    setEventImageFile(null); setEventImagePreview(null);
+                    setEventImageFile(null); setEventImagePreview(null); setSpeakerImageFiles({}); setGalleryPreview([]);
                   }} className="space-y-6">
                     <div className="space-y-3">
                       <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Forum Title</label>
@@ -779,8 +819,12 @@ const Admin = () => {
                       <input name="venue" defaultValue={showEventForm.venue} required className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
                     </div>
                     <div className="space-y-3">
-                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL)</label>
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Registration Site (URL) / Action Link</label>
                       <input name="registrationLink" defaultValue={showEventForm.registrationLink} placeholder="https://..." className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white outline-none" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Narrative Description</label>
+                      <textarea name="description" defaultValue={showEventForm.description} rows="4" className="w-full bg-stone-900/50 border border-stone-800 p-4 text-white focus:ring-1 focus:ring-secondary focus:border-secondary transition-all outline-none italic" placeholder="Details for the archival record..." />
                     </div>
                     <div className="space-y-3">
                       <label className="font-label uppercase text-[10px] tracking-widest text-stone-500 font-bold">Cover Image</label>
@@ -799,14 +843,114 @@ const Admin = () => {
                           </div>
                         )}
                         <div>
-                          <p className="font-label uppercase text-[10px] tracking-widest text-stone-400 group-hover:text-white transition-colors">{eventImageFile ? eventImageFile.name : 'Choose image file'}</p>
-                          <p className="text-stone-600 text-[9px] mt-1">JPG, PNG, WEBP — uploaded to Cloudinary</p>
+                          <p className="font-label uppercase text-[10px] tracking-widest text-stone-400 group-hover:text-white transition-colors">{eventImageFile ? eventImageFile.name : 'Choose cover file'}</p>
+                          <p className="text-secondary text-[8px] uppercase tracking-widest mt-1 font-bold italic">Limit: 10MB per image</p>
                         </div>
                       </label>
                     </div>
-                    <div className="flex items-center gap-4 py-2 group">
-                      <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />
-                      <label htmlFor="isPrimary" className="font-label uppercase text-[10px] tracking-[0.2em] text-stone-300 group-hover:text-secondary transition-colors cursor-pointer">Feature this Engagement</label>
+
+                    {/* Speakers / Orchestrators Section */}
+                    <div className="space-y-6 pt-6 border-t border-stone-800">
+                      <div className="flex justify-between items-center">
+                        <label className="font-label uppercase text-[11px] tracking-[0.3em] text-secondary font-bold">Orchestrators & Curators</label>
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const newSpeakers = [...(showEventForm.speakers || []), { name: '', role: '', bio: '', imageUrl: '' }];
+                            setShowEventForm({...showEventForm, speakers: newSpeakers});
+                          }}
+                          className="text-white hover:text-secondary transition-colors flex items-center gap-2 font-label uppercase text-[9px] tracking-widest border border-stone-800 px-3 py-1.5 hover:bg-stone-900"
+                        >
+                          <Plus className="w-3 h-3" /> Append Speaker
+                        </button>
+                      </div>
+
+                      <div className="space-y-8">
+                        {(showEventForm.speakers || []).map((speaker, idx) => (
+                          <div key={idx} className="p-6 bg-stone-900/30 border border-stone-800 space-y-6 relative group/speaker">
+                            <button 
+                              type="button"
+                              onClick={() => {
+                                const newSpeakers = showEventForm.speakers.filter((_, i) => i !== idx);
+                                setShowEventForm({...showEventForm, speakers: newSpeakers});
+                                const newFiles = {...speakerImageFiles};
+                                delete newFiles[idx];
+                                setSpeakerImageFiles(newFiles);
+                              }}
+                              className="absolute top-4 right-4 bg-stone-950 p-2 text-stone-600 hover:text-primary transition-colors opacity-0 group-hover/speaker:opacity-100"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+
+                            <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+                              <div className="md:col-span-3">
+                                <label className="font-label uppercase text-[9px] tracking-widest text-stone-500 mb-3 block">Profile Artifact</label>
+                                <label className="relative aspect-square bg-stone-950 border border-stone-800 flex items-center justify-center cursor-pointer overflow-hidden group/img">
+                                  <input 
+                                    type="file" 
+                                    accept="image/*" 
+                                    className="hidden" 
+                                    onChange={(e) => {
+                                      const file = e.target.files[0];
+                                      if (file) {
+                                        setSpeakerImageFiles({...speakerImageFiles, [idx]: file});
+                                      }
+                                    }}
+                                  />
+                                  {speakerImageFiles[idx] || speaker.imageUrl ? (
+                                    <img 
+                                      src={speakerImageFiles[idx] ? URL.createObjectURL(speakerImageFiles[idx]) : speaker.imageUrl} 
+                                      alt="Speaker" 
+                                      className="w-full h-full object-cover grayscale transition-all group-hover/img:grayscale-0" 
+                                    />
+                                  ) : (
+                                    <Plus className="w-6 h-6 text-stone-700 group-hover/img:text-secondary transition-colors" />
+                                  )}
+                                </label>
+                              </div>
+                              <div className="md:col-span-9 space-y-4">
+                                <div>
+                                  <label className="font-label uppercase text-[9px] tracking-widest text-stone-500 mb-2 block">Full Name</label>
+                                  <input 
+                                    name={`speaker_name_${idx}`} 
+                                    defaultValue={speaker.name} 
+                                    required 
+                                    placeholder="e.g. Adisa Olutoye"
+                                    className="w-full bg-stone-950 border border-stone-800 p-3 text-white outline-none focus:border-secondary transition-colors" 
+                                  />
+                                </div>
+                                <div>
+                                  <label className="font-label uppercase text-[9px] tracking-widest text-stone-500 mb-2 block">Designation / Role</label>
+                                  <input 
+                                    name={`speaker_role_${idx}`} 
+                                    defaultValue={speaker.role} 
+                                    required 
+                                    placeholder="e.g. Lead Architect, curator"
+                                    className="w-full bg-stone-950 border border-stone-800 p-3 text-white outline-none focus:border-secondary transition-colors" 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                            <div>
+                              <label className="font-label uppercase text-[9px] tracking-widest text-stone-500 mb-2 block">Brief Biography</label>
+                              <textarea 
+                                name={`speaker_bio_${idx}`} 
+                                defaultValue={speaker.bio} 
+                                rows="3" 
+                                placeholder="Details about this orchestrator's vision..."
+                                className="w-full bg-stone-950 border border-stone-800 p-3 text-white outline-none focus:border-secondary transition-colors italic text-sm" 
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-stone-800 space-y-4">
+                      <div className="flex items-center gap-4 py-2 group">
+                        <input type="checkbox" name="isPrimary" id="isPrimary" defaultChecked={showEventForm.isPrimary} className="w-5 h-5 bg-stone-900 border-stone-700 rounded text-secondary focus:ring-secondary transition-all" />
+                        <label htmlFor="isPrimary" className="font-label uppercase text-[10px] tracking-[0.2em] text-stone-300 group-hover:text-secondary transition-colors cursor-pointer">Feature Engagement</label>
+                      </div>
                     </div>
                     <button disabled={uploading} className="w-full bg-secondary text-black py-5 font-label uppercase tracking-[0.25em] text-[10px] font-bold hover:bg-neutral-800 hover:text-white transition-all shadow-xl disabled:opacity-50 disabled:cursor-wait">
                       {uploading ? 'Uploading Image…' : 'Synchronize Forum'}
@@ -905,6 +1049,18 @@ const Admin = () => {
           >
             <Calendar className="w-5 h-5" />
             <span className="font-label uppercase tracking-[0.1em] text-[8px]">Forums</span>
+          </button>
+          
+          <div className="h-8 w-px bg-white/5 mx-2"></div>
+
+          <Link to="/" className="flex flex-col items-center gap-1 py-1 text-stone-500 opacity-60 hover:text-white transition-all">
+            <ExternalLink className="w-5 h-5" />
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">Exit</span>
+          </Link>
+
+          <button onClick={handleLogout} className="flex flex-col items-center gap-1 py-1 text-stone-500 opacity-60 hover:text-red-500 transition-all">
+            <LogOut className="w-5 h-5" />
+            <span className="font-label uppercase tracking-[0.1em] text-[8px]">Logout</span>
           </button>
         </div>
       </nav>

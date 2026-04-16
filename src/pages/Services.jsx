@@ -66,13 +66,14 @@ const Services = () => {
       <div className="fixed inset-0 grain-overlay z-[60] pointer-events-none"></div>
       
       {/* Hero Section */}
+      {/* Hero Section */}
       <header className="mb-20 md:mb-24">
-        <p className="font-label font-extralight uppercase tracking-[0.2em] text-[10px] text-secondary mb-4">Architectural Curator</p>
+        <p className="font-label font-extralight uppercase tracking-[0.2em] text-[10px] text-secondary mb-4">Systems Thinker & Brand Strategist</p>
         <h1 className="font-headline text-5xl md:text-8xl lg:text-9xl font-light tracking-tight md:-tracking-[0.04em] leading-none italic mb-8">
-          Curated <span className="text-primary md:text-on-surface-variant not-italic">Services</span>
+          Strategic <span className="text-secondary md:text-on-surface-variant not-italic">Disciplines</span>
         </h1>
         <p className="font-body font-extralight text-on-surface-variant md:text-stone-400 leading-relaxed max-w-sm md:max-w-md text-lg md:text-xl">
-          A meticulous approach to space, form, and heritage. We transform conceptual visions into physical legacies through precision and artistic intent.
+          A disciplined approach to building. Bridging the gap between vision and execution through precision, systems thinking, and intentionality.
         </p>
       </header>
 
@@ -88,9 +89,25 @@ const Services = () => {
                 <div className="flex gap-6 md:block">
                   <span className="font-label text-secondary font-bold text-[10px] md:text-sm tracking-widest pt-2 md:pt-0 md:mb-8 block">{service.id}</span>
                   <div>
-                    <h2 className="font-headline text-3xl md:text-3xl font-light mb-4 group-hover:text-primary transition-colors leading-tight">{service.title}</h2>
+                    <h2 className="font-headline text-3xl md:text-3xl font-light mb-4 group-hover:text-primary transition-colors leading-tight">
+                      {index === 0 ? "Brand Strategy" : 
+                       index === 1 ? "Public Speaking" :
+                       index === 2 ? "Voice Over Acting" :
+                       index === 3 ? "Strategic Advisory" :
+                       index === 4 ? "Fashion Consulting" :
+                       index === 5 ? "Personal Branding" :
+                       index === 6 ? "Market Strategy" :
+                       "Creative Influencing"}
+                    </h2>
                     <p className="font-body font-extralight text-on-surface-variant md:text-stone-500 text-sm leading-relaxed mb-6 md:mb-0">
-                      {service.desc}
+                      {index === 0 ? "Defining identity, refining positioning, and building systems that support sustainable growth." : 
+                       index === 1 ? "Keynotes on leadership and growth. Sessions built to provide clarity, not just inspiration." :
+                       index === 2 ? "Tailored auditory identity for brand storytelling and campaigns with precision in tone and delivery." :
+                       index === 3 ? "Supporting leaders in refining complex ideas and making decisions with long-term strategic impact." :
+                       index === 4 ? "Refining physical visual identity to align with personal presence and professional positioning." :
+                       index === 5 ? "Developing clear, credible, and aligned personal brands for founders and visionaries." :
+                       index === 6 ? "Designing structured marketing strategies designed for high-conversion and measurable outcomes." :
+                       "Intentional content creation and brand partnerships that generate visibility and build aligned communities."}
                     </p>
                     <div className="flex items-center gap-2 group/btn md:hidden">
                       <span className="font-label uppercase tracking-widest text-[10px] text-primary">Inquiry</span>
@@ -104,7 +121,7 @@ const Services = () => {
               {index === 0 && (
                 <div className="w-full h-48 mb-8 overflow-hidden md:hidden">
                   <img 
-                    alt="Architectural living space" 
+                    alt="Strategic Brand Development" 
                     className="w-full h-full object-cover grayscale opacity-50 hover:grayscale-0 hover:opacity-100 transition-all duration-700" 
                     src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_Gx2sWL6l5CVaWns0pcpQUl0SjFa0IwGnYlm3rFlUxji871hj5NmDibhUMvO6AgS4xPH2diMGWTETEC87bK2V4pokVvguFpnD3tf36HYvVVzImHK9_asqmjNInQ8wM2m8VDyj7DDDYlk5Y4CS4auLfTmiqNGO4LRVMjuQSD0farH4NeZg-MjKmuQnp4VqGdZzUFeG82ga6BbBI5jCtdAYfaB0XqIzSi4yK6zOLk44J-B4QhmfdjWlCwySF181QJaS2U9h9U2Vw1Q"
                   />
@@ -123,8 +140,8 @@ const Services = () => {
       <section className="mt-24 md:mt-32 mb-12">
         <div className="bg-primary-container p-10 md:py-24 md:flex md:flex-col md:items-center md:text-center relative overflow-hidden">
           <div className="relative z-10">
-            <h3 className="font-headline text-4xl md:text-5xl text-white font-light leading-tight mb-8 md:mb-12 max-w-2xl">Begin Your Architectural Narrative.</h3>
-            <Link to="/connect" className="inline-block bg-white md:bg-transparent text-primary-container md:text-white border md:border-white/30 font-label uppercase tracking-widest text-xs px-8 md:px-12 py-4 md:py-5 font-bold md:font-normal hover:bg-white hover:text-primary-container transition-all active:scale-95 shadow-xl shadow-black/10">
+            <h3 className="font-headline text-4xl md:text-5xl text-white font-light leading-tight mb-8 md:mb-12 max-w-2xl">Refine your brand. Structure your ideas.</h3>
+            <Link to="/connect" className="inline-block bg-white md:bg-transparent text-primary-container md:text-white border md:border-white/30 font-label uppercase tracking-widest text-xs px-8 md:px-12 py-4 md:py-5 font-bold md:font-normal hover:bg-white hover:text-primary-container transition-all active:scale-[0.99] shadow-xl shadow-black/10">
               Schedule Consultation
             </Link>
           </div>
