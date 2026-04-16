@@ -8,10 +8,10 @@ import { uploadToCloudinary } from '../lib/uploadToCloudinary';
 import { compressImage } from '../utils/compressImage';
 import curator from '../assets/Frame 5.svg';
 
-// EmailJS Configuration (Replace with your keys)
-const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
-const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
-const EMAILJS_USER_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_USER_TEMPLATE_ID;
+// EmailJS Configuration
+const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID || 'service_9jb5rez';
+const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY || 'k7zeSlbI00R-E3sGa';
+const EMAILJS_USER_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_USER_TEMPLATE_ID || 'template_v0dy8mc';
 import { 
   LayoutDashboard, 
   FileText, 
