@@ -17,6 +17,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Admin = lazy(() => import('./pages/Admin'));
 const BlogPostDetail = lazy(() => import('./pages/BlogPostDetail'));
 const EventDetail = lazy(() => import('./pages/EventDetail'));
+const SpeakerProfile = lazy(() => import('./pages/SpeakerProfile'));
 
 // Premium Loading State
 const PageLoader = () => (
@@ -43,6 +44,7 @@ function AppContent() {
             <Route path="/events" element={<Events />} />
             <Route path="/blog/:id" element={<BlogPostDetail />} />
             <Route path="/event/:id" element={<EventDetail />} />
+            <Route path="/event/:eventId/speaker/:speakerIndex" element={<SpeakerProfile />} />
             <Route path="/connect" element={<Connect />} />
             <Route path="/login" element={<Login />} />
             <Route 
