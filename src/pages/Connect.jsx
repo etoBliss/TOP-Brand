@@ -10,6 +10,7 @@ const EMAILJS_SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
 const EMAILJS_PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
 const EMAILJS_ADMIN_TEMPLATE_ID = import.meta.env.VITE_EMAILJS_ADMIN_TEMPLATE_ID;
 import { ArrowRight, ChevronDown, Home as HomeIcon, Building2, BookOpen, Mail, AtSign, Share2, ArrowUpRight } from 'lucide-react';
+import { Instagram, XIcon, Linkedin } from '../components/BrandIcons';
 
 const Connect = () => {
   const [formData, setFormData] = useState({
@@ -171,17 +172,17 @@ const Connect = () => {
           <div className="md:col-span-5 space-y-12">
             {/* Social Grid */}
             <div className="grid grid-cols-2 gap-px bg-neutral-900 border border-neutral-900">
-              <a href="#" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
-                <AtSign className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
+              <a href="https://www.instagram.com/thatspace_boy?igsh=MW80ZjJodnZidnlxNW==" target="_blank" rel="noopener noreferrer" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
+                <Instagram className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
                 <span className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Instagram</span>
               </a>
-              <a href="#" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
-                <Share2 className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
+              <a href="https://ng.linkedin.com/in/the-oluwadolapo-popoola-top-b22b1a21a" target="_blank" rel="noopener noreferrer" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
+                <Linkedin className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
                 <span className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">LinkedIn</span>
               </a>
-              <a href="#" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
-                <Mail className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
-                <span className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">Email</span>
+              <a href="https://x.com/thatspace_boy?s=21" target="_blank" rel="noopener noreferrer" className="bg-surface p-8 group flex flex-col justify-between aspect-square hover:bg-surface-container-high transition-colors">
+                <XIcon className="w-6 h-6 text-neutral-600 group-hover:text-primary transition-colors" />
+                <span className="text-[10px] uppercase tracking-widest text-neutral-500 font-bold">X (Twitter)</span>
               </a>
               <div className="bg-surface p-8 flex items-center justify-center aspect-square relative overflow-hidden">
                 <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(#9E0B00 1px, transparent 1px)', backgroundSize: '10px 10px' }}></div>

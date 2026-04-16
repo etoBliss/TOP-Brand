@@ -1,15 +1,69 @@
+import { Mail } from 'lucide-react';
+import { Instagram, XIcon, TikTok, Linkedin, Youtube } from './BrandIcons';
+
 const Footer = () => {
   return (
-    <footer className="w-full border-t border-stone-900 bg-stone-950 flex flex-col md:flex-row justify-between items-center px-12 py-16">
-      <div className="text-xl font-black text-white font-headline mb-8 md:mb-0">TOP</div>
-      <div className="flex flex-wrap justify-center gap-8 md:gap-12 mb-8 md:mb-0">
-        <a className="font-body font-extralight tracking-widest text-[11px] uppercase text-stone-600 hover:text-primary transition-opacity opacity-80 hover:opacity-100 underline underline-offset-8" href="#">Instagram</a>
-        <a className="font-body font-extralight tracking-widest text-[11px] uppercase text-stone-600 hover:text-primary transition-opacity opacity-80 hover:opacity-100 underline underline-offset-8" href="#">LinkedIn</a>
-        <a className="font-body font-extralight tracking-widest text-[11px] uppercase text-stone-600 hover:text-primary transition-opacity opacity-80 hover:opacity-100 underline underline-offset-8" href="#">Threads</a>
-        <a className="font-body font-extralight tracking-widest text-[11px] uppercase text-stone-600 hover:text-primary transition-opacity opacity-80 hover:opacity-100 underline underline-offset-8" href="#">Contact</a>
+    <footer className="w-full border-t border-stone-900 bg-stone-950 flex flex-col md:flex-row justify-between items-center px-12 py-16 gap-8 md:gap-0">
+      <div className="text-xl font-black text-white font-headline">TOP</div>
+      
+      <div className="flex flex-wrap justify-center gap-6 md:gap-10">
+        <a 
+          href="https://www.instagram.com/thatspace_boy?igsh=MW80ZjJodnZidnlxNW==" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-stone-500 hover:text-secondary transition-all transform hover:scale-110"
+          aria-label="Instagram"
+        >
+          <Instagram className="w-5 h-5" />
+        </a>
+        <a 
+          href="https://x.com/thatspace_boy?s=21" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-stone-500 hover:text-secondary transition-all transform hover:scale-110"
+          aria-label="X (Twitter)"
+        >
+          <XIcon className="w-5 h-5" />
+        </a>
+        <a 
+          href="https://www.tiktok.com/@thatspace_boy" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-stone-500 hover:text-secondary transition-all transform hover:scale-110"
+          aria-label="TikTok"
+        >
+          <TikTok className="w-5 h-5" />
+        </a>
+        <a 
+          href="https://ng.linkedin.com/in/the-oluwadolapo-popoola-top-b22b1a21a" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-stone-500 hover:text-secondary transition-all transform hover:scale-110"
+          aria-label="LinkedIn"
+        >
+          <Linkedin className="w-5 h-5" />
+        </a>
+        <a 
+          href="https://youtube.com/channel/UCZ8ah78fMVoOAJIOB9XLDBA" 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="text-stone-500 hover:text-secondary transition-all transform hover:scale-110"
+          aria-label="YouTube"
+        >
+          <Youtube className="w-5 h-5" />
+        </a>
+        <div className="w-[1px] h-5 bg-stone-800 hidden md:block"></div>
+        <a 
+          href="mailto:popooladolapo7@gmail.com"
+          className="text-stone-500 hover:text-primary transition-all transform hover:scale-110"
+          aria-label="Email"
+        >
+          <Mail className="w-5 h-5" />
+        </a>
       </div>
-      <div className="font-body font-extralight tracking-widest text-[11px] uppercase text-stone-600">
-        © 2026 THE OLUWADOLAPO POPOOLA. ALL RIGHTS RESERVED.
+
+      <div className="font-body font-extralight tracking-widest text-[9px] md:text-[11px] uppercase text-stone-700 md:text-stone-600 text-center md:text-right">
+        © 2026 THE OLUWADOLAPO POPOOLA. <br className="md:hidden" /> ALL RIGHTS RESERVED.
       </div>
     </footer>
   );
