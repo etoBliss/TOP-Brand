@@ -59,16 +59,23 @@ const EventDetail = () => {
     "@context": "https://schema.org",
     "@type": "Event",
     "name": event.title,
-    "description": event.description,
+    "description": event.description || "Refining vision and building systems for global impact.",
     "startDate": event.date,
     "location": {
       "@type": "Place",
       "name": event.venue,
       "address": {
         "@type": "PostalAddress",
-        "addressLocality": event.location
+        "addressLocality": event.location,
+        "addressCountry": "Nigeria"
       }
     },
+    "performer": {
+      "@type": "Person",
+      "name": "Oluwadolapo Popoola"
+    },
+    "eventStatus": "https://schema.org/EventScheduled",
+    "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
     "image": [event.imageUrl || "/og-image.jpg"]
   } : null;
 

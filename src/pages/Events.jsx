@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { db } from '../lib/firebase';
 import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
-import { ArrowRight, Calendar, MapPin, Ticket, Building2 } from 'lucide-react';
+import { ArrowRight, Calendar, MapPin, Ticket, Building2, Home as HomeIcon, BookOpen, Mail } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const Events = () => {
