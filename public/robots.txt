@@ -1,0 +1,18 @@
+# robots.txt for THE OLUWADOLAPO POPOOLA (TOP)
+# Coordinating search engine behavior across the global architectural network.
+
+User-agent: *
+Allow: /
+Allow: /blog
+Allow: /events
+Allow: /services
+Allow: /about
+
+# Disallow access to experimental and administrative routes
+Disallow: /admin
+Disallow: /login
+Disallow: /tmp
+Disallow: /private
+
+# Sitemap location
+Sitemap: https://topbrand.example.com/sitemap.xml

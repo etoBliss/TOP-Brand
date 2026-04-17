@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
-import { ArrowLeft, Clock, Share2 } from 'lucide-react';
+import { ArrowLeft, Clock, Share2, Share } from 'lucide-react';
 import SEO from '../components/SEO';
+import Skeleton from '../components/Skeleton';
 
 const BlogPostDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [blog, setBlog] = useState(null);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -14,42 +15,70 @@ const BlogPostDetail = () => {
   useEffect(() => {
     const fetchBlog = async () => {
       try {
-        const docRef = doc(db, 'blogs', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setBlog({ id: docSnap.id, ...docSnap.data() });
+        // High-authority semantic slug lookup
+        const q = query(
+          collection(db, 'blogs'), 
+          where('slug', '==', slug), 
+          limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          setBlog({ id: doc.id, ...doc.data() });
+        } else {
+          // Fallback to ID for legacy archival links
+          const legacyDoc = await getDoc(doc(db, 'blogs', slug));
+          if (legacyDoc.exists()) {
+             setBlog({ id: legacyDoc.id, ...legacyDoc.data() });
+          }
         }
       } catch (err) {
-        console.error("Data retrieval failure:", err);
+        console.error("Archive retrieval failure:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchBlog();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [slug]);
 
   if (loading) return (
     <div className="min-h-screen bg-stone-950 flex items-center justify-center">
-      <div className="w-12 h-0.5 bg-primary animate-pulse"></div>
+       <div className="w-12 h-12 border-t-2 border-primary animate-spin rounded-full"></div>
     </div>
   );
 
   if (!blog) return (
-    <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-white p-6">
-      <h2 className="font-headline text-3xl mb-4 italic text-stone-400">Strategic artifact not found.</h2>
-      <Link to="/blog" className="text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all">Return to Global Forum</Link>
+    <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-center p-8">
+      <h2 className="font-headline text-4xl text-white mb-6">Archive Missing</h2>
+      <Link to="/blog" className="text-secondary font-label uppercase tracking-widest text-[10px]">Return to Journal</Link>
     </div>
   );
 
-   return (
+   const blogSchema = blog ? {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": blog.title,
+    "image": [blog.imageUrl || "/og-image.jpg"],
+    "datePublished": blog.timestamp?.toDate().toISOString() || new Date().toISOString(),
+    "author": [{
+      "@type": "Person",
+      "name": "Oluwadolapo Popoola",
+      "url": "https://example.com/about"
+    }],
+    "description": blog.excerpt
+  } : null;
+
+  return (
     <div className="min-h-screen bg-stone-950 text-white pb-32 overflow-x-hidden">
       <SEO 
-        title={blog.title} 
+        title={`${blog.title} | Oluwadolapo Popoola`} 
         description={blog.excerpt} 
         image={blog.imageUrl} 
         article={true}
-        path={`/blog/${blog.id}`}
+        path={`/blog/${slug}`}
+        schema={blogSchema}
       />
 
        {/* Hero Banner Section: Contained & Content-Free */}

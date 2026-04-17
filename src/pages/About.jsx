@@ -5,14 +5,35 @@ import topImage from "../assets/2a 1.svg"
 import SEO from '../components/SEO';
 
 const About = () => {
+  const personSchema = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Oluwadolapo Popoola",
+    "alternateName": "Dolapo Popoola",
+    "jobTitle": "Brand Strategist & Systems Thinker",
+    "url": "https://example.com/about",
+    "image": "https://example.com/assets/2a 1.svg",
+    "sameAs": [
+      "https://linkedin.com/in/oluwadolapo-popoola", // Placeholder
+      "https://twitter.com/oluwadolapo", // Placeholder
+      "https://instagram.com/oluwadolapo" // Placeholder
+    ],
+    "worksFor": {
+      "@type": "Organization",
+      "name": "TOP BRAND"
+    },
+    "description": "Oluwadolapo Popoola is a brand strategist and systems thinker operating at the intersection of leadership, strategy, and intentional execution."
+  };
+
   return (
     <main className="pt-24 md:pt-32 pb-24">
       <SEO 
-        title="About The Blueprint" 
+        title="Oluwadolapo Popoola | Brand Strategist" 
         description="Rooted in the discipline of medicine and the precision of strategy, TOP represents the singular vision of Oluwadolapo Popoola."
         path="/about"
+        schema={personSchema}
       />
-      <div className="fixed inset-0 grain-overlay z-[100]"></div>
+      <div className="fixed inset-0 grain-overlay z-[100] pointer-events-none"></div>
       
       {/* Hero Section: Narrative Arc */}
       <section className="px-6 md:px-24 mb-20 md:mb-32 grid grid-cols-1 md:grid-cols-12 gap-8 items-end">
@@ -22,9 +43,9 @@ const About = () => {
           transition={{ duration: 0.8 }}
           className="md:col-span-8"
         >
-          <span className="font-label text-[10px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-secondary mb-4 md:mb-6 block">The Blueprint</span>
-          <h1 className="font-headline text-5xl md:text-9xl font-black md:font-light tracking-tighter leading-[1.1] md:leading-none mb-8">
-            The Intersection of <span className="text-secondary italic">Systems</span> & Strategy.
+          <span className="font-label text-[10px] md:text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] text-secondary mb-4 md:mb-6 block">The Visionary</span>
+          <h1 className="font-headline text-5xl md:text-9xl font-black md:font-light tracking-tighter leading-[1.1] md:leading-none mb-8 text-white">
+            Oluwadolapo <span className="text-secondary italic">Popoola.</span>
           </h1>
         </motion.div>
         <motion.div 
@@ -34,7 +55,7 @@ const About = () => {
           className="md:col-span-4 pb-4"
         >
           <p className="font-body font-extralight text-lg leading-relaxed text-stone-400 border-l border-outline-variant/20 pl-6 md:pl-8 max-w-sm md:max-w-none">
-            Rooted in the discipline of medicine and the precision of strategy, TOP represents the singular vision of Oluwadolapo Popoola. I build systems that bridge the gap between vision and results.
+            Operating at the intersection of leadership, strategy, and intentional execution, TOP represents the singular vision of Oluwadolapo Popoola. I build systems that bridge the gap between vision and results.
           </p>
         </motion.div>
         <motion.div 

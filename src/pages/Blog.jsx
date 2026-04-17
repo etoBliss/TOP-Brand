@@ -149,7 +149,7 @@ const Blog = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-16 md:gap-16">
               {blogs.map((post) => (
-                <Link key={post.id} to={`/blog/${post.id}`} className="group cursor-pointer block">
+                <Link key={post.id} to={`/blog/${post.slug || post.id}`} className="group cursor-pointer block">
                   <article>
                     <div className="aspect-[4/5] md:aspect-video w-full overflow-hidden mb-6 md:mb-4 bg-surface-container-low">
                       <div className="w-full h-full bg-surface-container-high group-hover:bg-primary-container/10 transition-all duration-700 flex items-center justify-center relative">
@@ -205,7 +205,7 @@ const Blog = () => {
                <div className="p-6 text-stone-600 font-label uppercase tracking-widest text-[10px]">No active forums at this moment.</div>
             ) : (
               events.map((event) => (
-                <Link key={event.id} to={`/event/${event.id}`} className="group block">
+                <Link key={event.id} to={`/event/${event.slug || event.id}`} className="group block">
                   <div className="p-6 md:py-12 md:px-4 flex flex-col md:grid md:grid-cols-12 md:items-center gap-6 md:gap-8 border-b border-stone-800/50 hover:bg-surface-container transition-all text-left">
                     <div className="flex justify-between items-start md:col-span-2">
                       <div className="flex flex-col">

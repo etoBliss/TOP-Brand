@@ -33,7 +33,7 @@ const Events = () => {
       <section className="py-12 px-8 md:px-16">
         <div className="max-w-6xl mx-auto space-y-1">
           {events.map((event) => (
-            <Link key={event.id} to={`/event/${event.id}`} className="group block">
+            <Link key={event.id} to={`/event/${event.slug || event.id}`} className="group block">
               <div className="py-16 flex flex-col md:grid md:grid-cols-12 items-center gap-12 border-t border-stone-800 hover:bg-stone-900 transition-colors px-6">
                 <div className="md:col-span-2">
                   <div className="flex items-center gap-3 mb-2">

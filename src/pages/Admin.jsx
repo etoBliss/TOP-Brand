@@ -181,10 +181,11 @@ const Admin = () => {
 
   // Event Logic
   const saveEvent = async (data) => {
+    const slug = generateSlug(data.title, 'oluwadolapo-popoola'); // Branded slug
     if (data.id) {
-      await updateDoc(doc(db, 'events', data.id), { ...data });
+      await updateDoc(doc(db, 'events', data.id), { ...data, slug });
     } else {
-      await addDoc(collection(db, 'events'), { ...data, timestamp: serverTimestamp() });
+      await addDoc(collection(db, 'events'), { ...data, slug, timestamp: serverTimestamp() });
     }
     setShowEventForm(null);
   };

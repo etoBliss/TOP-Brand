@@ -5,7 +5,8 @@ const SEO = ({
   description, 
   image = "/og-image.jpg", 
   article = false,
-  path = ""
+  path = "",
+  schema = null // New prop for JSON-LD data
 }) => {
   const siteName = "THE OLUWADOLAPO POPOOLA (TOP)";
   const fullTitle = title ? `${title} | ${siteName}` : siteName;
@@ -17,6 +18,7 @@ const SEO = ({
       {/* Base Meta Tags */}
       <title>{fullTitle}</title>
       <meta name="description" content={description || "Building people, brands, and systems with clarity and precision."} />
+      <link rel="canonical" href={fullUrl} />
       
       {/* Open Graph / Facebook */}
       <meta property="og:type" content={article ? 'article' : 'website'} />
@@ -31,6 +33,13 @@ const SEO = ({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={image} />
+
+      {/* JSON-LD Structured Data */}
+      {schema && (
+        <script type="application/ld+json">
+          {JSON.stringify(schema)}
+        </script>
+      )}
     </Helmet>
   );
 };

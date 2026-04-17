@@ -1,32 +1,46 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { collection, query, where, getDocs, limit, doc, getDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, ArrowRight, ArrowDown, Calendar, MapPin, Building2, ExternalLink } from 'lucide-react';
 import SEO from '../components/SEO';
+import Skeleton from '../components/Skeleton';
 
 const EventDetail = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEvent = async () => {
       try {
-        const docRef = doc(db, 'events', id);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          setEvent({ id: docSnap.id, ...docSnap.data() });
+        // Query by high-authority semantic slug
+        const q = query(
+          collection(db, 'events'), 
+          where('slug', '==', slug), 
+          limit(1)
+        );
+        const querySnapshot = await getDocs(q);
+        
+        if (!querySnapshot.empty) {
+          const doc = querySnapshot.docs[0];
+          setEvent({ id: doc.id, ...doc.data() });
+        } else {
+          // Fallback to ID for legacy archival links
+          const legacyDoc = await getDoc(doc(db, 'events', slug));
+          if (legacyDoc.exists()) {
+            setEvent({ id: legacyDoc.id, ...legacyDoc.data() });
+          }
         }
       } catch (err) {
-        console.error("Historical data retrieval failure:", err);
+        console.error("Archive retrieval failure:", err);
       } finally {
         setLoading(false);
       }
     };
     fetchEvent();
     window.scrollTo(0, 0);
-  }, [id]);
+  }, [slug]);
 
   if (loading) return (
     <div className="min-h-screen bg-stone-950 flex items-center justify-center">
@@ -41,6 +55,23 @@ const EventDetail = () => {
     </div>
   );
 
+  const eventSchema = event ? {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    "name": event.title,
+    "description": event.description,
+    "startDate": event.date,
+    "location": {
+      "@type": "Place",
+      "name": event.venue,
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": event.location
+      }
+    },
+    "image": [event.imageUrl || "/og-image.jpg"]
+  } : null;
+
   return (
     <div className="min-h-screen bg-stone-950 text-white pb-32 overflow-x-hidden">
       <SEO 
@@ -48,6 +79,7 @@ const EventDetail = () => {
         description={event.description} 
         image={event.imageUrl} 
         path={`/event/${event.id}`}
+        schema={eventSchema}
       />
        {/* Top Hero Banner Section: Contained & Content-Free */}
        <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden bg-stone-900 border-b border-white/5 animate-in fade-in duration-1000">
