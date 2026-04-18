@@ -3,7 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, Globe } from 'lucide-react';
-import { Instagram, Linkedin } from '../components/BrandIcons';
+import { Instagram, Linkedin, XIcon } from '../components/BrandIcons';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 
@@ -199,19 +199,28 @@ const SpeakerProfile = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="mt-20 pt-10 border-t border-white/5 flex gap-8 items-center"
+          className="mt-20 pt-10 border-t border-white/5"
         >
-          <span className="font-label uppercase tracking-widest text-[10px] text-stone-600">Digital Footprint</span>
-          <div className="flex gap-6">
-            <a href="#" aria-label="Instagram" className="text-stone-500 hover:text-white transition-colors">
-              <Instagram className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="LinkedIn" className="text-stone-500 hover:text-white transition-colors">
-              <Linkedin className="w-4 h-4" />
-            </a>
-            <a href="#" aria-label="Website" className="text-stone-500 hover:text-white transition-colors">
-              <Globe className="w-4 h-4" />
-            </a>
+          <span className="font-label uppercase tracking-widest text-[10px] text-stone-600 block mb-5">Digital Footprint</span>
+          <div className="flex gap-6 items-center">
+            {speaker.instagram && (
+              <a href={speaker.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-stone-500 hover:text-white transition-colors">
+                <Instagram className="w-5 h-5" />
+              </a>
+            )}
+            {speaker.linkedin && (
+              <a href={speaker.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-stone-500 hover:text-white transition-colors">
+                <Linkedin className="w-5 h-5" />
+              </a>
+            )}
+            {speaker.twitter && (
+              <a href={speaker.twitter} target="_blank" rel="noopener noreferrer" aria-label="X / Twitter" className="text-stone-500 hover:text-white transition-colors">
+                <XIcon className="w-5 h-5" />
+              </a>
+            )}
+            {!speaker.instagram && !speaker.linkedin && !speaker.twitter && (
+              <span className="font-label text-[10px] text-stone-700 italic">No social profiles linked.</span>
+            )}
           </div>
         </motion.div>
 

@@ -797,7 +797,10 @@ const Admin = () => {
                       ...s,
                       name: formData.get(`speaker_name_${idx}`),
                       role: formData.get(`speaker_role_${idx}`),
-                      bio: formData.get(`speaker_bio_${idx}`)
+                      bio: formData.get(`speaker_bio_${idx}`),
+                      instagram: formData.get(`speaker_instagram_${idx}`) || '',
+                      linkedin: formData.get(`speaker_linkedin_${idx}`) || '',
+                      twitter: formData.get(`speaker_twitter_${idx}`) || '',
                     }));
 
                     saveEvent({
@@ -870,7 +873,7 @@ const Admin = () => {
                         <button 
                           type="button" 
                           onClick={() => {
-                            const newSpeakers = [...(showEventForm.speakers || []), { name: '', role: '', bio: '', imageUrl: '' }];
+                            const newSpeakers = [...(showEventForm.speakers || []), { name: '', role: '', bio: '', imageUrl: '', instagram: '', linkedin: '', twitter: '' }];
                             setShowEventForm({...showEventForm, speakers: newSpeakers});
                           }}
                           className="text-white hover:text-secondary transition-colors flex items-center gap-2 font-label uppercase text-[9px] tracking-widest border border-stone-800 px-3 py-1.5 hover:bg-stone-900"
@@ -955,6 +958,41 @@ const Admin = () => {
                                 className="w-full bg-stone-950 border border-stone-800 p-3 text-white outline-none focus:border-secondary transition-colors italic text-sm" 
                               />
                             </div>
+
+                            {/* Social Links */}
+                            <div>
+                              <label className="font-label uppercase text-[9px] tracking-widest text-secondary mb-3 block">Digital Footprint (Social Links)</label>
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                <div className="space-y-1">
+                                  <label className="font-label text-[8px] uppercase tracking-widest text-stone-600">Instagram URL</label>
+                                  <input 
+                                    name={`speaker_instagram_${idx}`} 
+                                    defaultValue={speaker.instagram || ''} 
+                                    placeholder="https://instagram.com/..."
+                                    className="w-full bg-stone-950 border border-stone-800 p-2.5 text-white text-sm outline-none focus:border-secondary transition-colors" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="font-label text-[8px] uppercase tracking-widest text-stone-600">LinkedIn URL</label>
+                                  <input 
+                                    name={`speaker_linkedin_${idx}`} 
+                                    defaultValue={speaker.linkedin || ''} 
+                                    placeholder="https://linkedin.com/in/..."
+                                    className="w-full bg-stone-950 border border-stone-800 p-2.5 text-white text-sm outline-none focus:border-secondary transition-colors" 
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="font-label text-[8px] uppercase tracking-widest text-stone-600">X / Twitter URL</label>
+                                  <input 
+                                    name={`speaker_twitter_${idx}`} 
+                                    defaultValue={speaker.twitter || ''} 
+                                    placeholder="https://x.com/..."
+                                    className="w-full bg-stone-950 border border-stone-800 p-2.5 text-white text-sm outline-none focus:border-secondary transition-colors" 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+
                           </div>
                         ))}
                       </div>
