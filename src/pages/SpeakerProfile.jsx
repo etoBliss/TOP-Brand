@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { doc, getDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, query, where, getDocs, limit } from 'firebase/firestore';
 import { db } from '../lib/firebase';
 import { ArrowLeft, Globe } from 'lucide-react';
 import { Instagram, Linkedin } from '../components/BrandIcons';
@@ -19,21 +19,43 @@ const formatBio = (bio) => {
 };
 
 const SpeakerProfile = () => {
-  const { eventId, speakerIndex } = useParams();
+  const { eventSlug, speakerIndex } = useParams();
   const [speaker, setSpeaker] = useState(null);
   const [eventTitle, setEventTitle] = useState('');
+  const [eventId, setEventId] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSpeakerData = async () => {
       try {
-        const docRef = doc(db, 'events', eventId);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-          const eventData = docSnap.data();
-          const speakerData = eventData.speakers[parseInt(speakerIndex)];
+        // First try slug lookup
+        let eventData = null;
+        let resolvedId = eventSlug;
+
+        const q = query(
+          collection(db, 'events'),
+          where('slug', '==', eventSlug),
+          limit(1)
+        );
+        const snap = await getDocs(q);
+
+        if (!snap.empty) {
+          resolvedId = snap.docs[0].id;
+          eventData = snap.docs[0].data();
+        } else {
+          // Fallback: treat eventSlug as a legacy Firestore ID
+          const docSnap = await getDoc(doc(db, 'events', eventSlug));
+          if (docSnap.exists()) {
+            resolvedId = docSnap.id;
+            eventData = docSnap.data();
+          }
+        }
+
+        if (eventData) {
+          const speakerData = eventData.speakers?.[parseInt(speakerIndex)];
           setSpeaker(speakerData);
           setEventTitle(eventData.title);
+          setEventId(resolvedId);
         }
       } catch (err) {
         console.error("Data retrieval failure:", err);
@@ -43,7 +65,7 @@ const SpeakerProfile = () => {
     };
     fetchSpeakerData();
     window.scrollTo(0, 0);
-  }, [eventId, speakerIndex]);
+  }, [eventSlug, speakerIndex]);
 
   if (loading) return (
     <div className="min-h-screen bg-stone-950 flex items-center justify-center">
