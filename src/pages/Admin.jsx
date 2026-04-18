@@ -157,12 +157,25 @@ const Admin = () => {
     }
   };
 
+  // Slug Utility — Generates branded, keyword-optimized URLs
+  const generateSlug = (text, prefix = '') => {
+    const slug = text
+      .toString()
+      .toLowerCase()
+      .trim()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]+/g, '')
+      .replace(/--+/g, '-');
+    return prefix ? `${prefix}-${slug}` : slug;
+  };
+
   // Blog Logic
   const saveBlog = async (data) => {
+    const slug = generateSlug(data.title, 'oluwadolapo-popoola');
     if (data.id) {
-      await updateDoc(doc(db, 'blogs', data.id), { ...data, timestamp: serverTimestamp() });
+      await updateDoc(doc(db, 'blogs', data.id), { ...data, slug });
     } else {
-      await addDoc(collection(db, 'blogs'), { ...data, timestamp: serverTimestamp() });
+      await addDoc(collection(db, 'blogs'), { ...data, slug, timestamp: serverTimestamp() });
     }
     setShowBlogForm(null);
   };

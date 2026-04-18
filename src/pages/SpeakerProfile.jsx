@@ -7,6 +7,17 @@ import { Instagram, Linkedin } from '../components/BrandIcons';
 import SEO from '../components/SEO';
 import { motion } from 'framer-motion';
 
+// Splits a biography into readable paragraphs (every ~2 sentences)
+const formatBio = (bio) => {
+  if (!bio) return [];
+  const sentences = bio.match(/[^.!?]+[.!?]+/g) || [bio];
+  const chunks = [];
+  for (let i = 0; i < sentences.length; i += 2) {
+    chunks.push(sentences.slice(i, i + 2).join(' ').trim());
+  }
+  return chunks;
+};
+
 const SpeakerProfile = () => {
   const { eventId, speakerIndex } = useParams();
   const [speaker, setSpeaker] = useState(null);
@@ -43,31 +54,37 @@ const SpeakerProfile = () => {
   if (!speaker) return (
     <div className="min-h-screen bg-stone-950 flex flex-col items-center justify-center text-white p-6">
       <h2 className="font-headline text-3xl mb-4 italic text-stone-400">Speaker profile not found.</h2>
-      <Link to={`/event/${eventId}`} className="text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all">Return to Forum</Link>
+      <Link to={`/event/${eventId}`} className="text-secondary font-label uppercase tracking-widest text-[10px] border border-secondary/20 px-6 py-3 hover:bg-secondary/5 transition-all">
+        Return to Forum
+      </Link>
     </div>
   );
 
+  const bioParagraphs = formatBio(speaker.bio);
+  const pullQuote = bioParagraphs[0] || '';
+  const bodyParagraphs = bioParagraphs.slice(1);
+
   return (
     <div className="min-h-screen bg-stone-950 text-white pb-32 overflow-x-hidden">
-      <SEO 
-        title={`${speaker.name} | Orchestrator`} 
-        description={speaker.bio} 
-        image={speaker.imageUrl} 
+      <SEO
+        title={`${speaker.name} | Orchestrator`}
+        description={speaker.bio}
+        image={speaker.imageUrl}
         path={`/event/${eventId}/speaker/${speakerIndex}`}
       />
 
-      {/* Hero Banner Section: Content-Free */}
-      <section className="relative w-full h-[50vh] md:h-[70vh] overflow-hidden bg-stone-900 border-b border-white/5">
-        <motion.div 
-           initial={{ scale: 1.1 }}
-           animate={{ scale: 1.0 }}
-           transition={{ duration: 1.5, ease: "easeOut" }}
-           className="w-full h-full"
+      {/* Hero Banner: Content-Free */}
+      <section className="relative w-full h-[50vh] md:h-[65vh] overflow-hidden bg-stone-900 border-b border-white/5">
+        <motion.div
+          initial={{ scale: 1.1 }}
+          animate={{ scale: 1.0 }}
+          transition={{ duration: 1.5, ease: "easeOut" }}
+          className="w-full h-full"
         >
           {speaker.imageUrl ? (
-            <img 
-              src={speaker.imageUrl} 
-              alt={speaker.name} 
+            <img
+              src={speaker.imageUrl}
+              alt={`${speaker.name} — Speaker at ${eventTitle}`}
               className="w-full h-full object-cover grayscale opacity-60"
             />
           ) : (
@@ -76,78 +93,106 @@ const SpeakerProfile = () => {
             </div>
           )}
         </motion.div>
-        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 to-transparent opacity-60"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-stone-950 via-stone-950/30 to-transparent"></div>
       </section>
 
-      {/* Detail Section: All text below banner */}
-      <section className="max-w-4xl mx-auto px-8 md:px-20 mt-12 md:mt-24">
-        
-        {/* Navigation Breadcrumb */}
-        <motion.div 
+      {/* All Content Below the Banner */}
+      <section className="max-w-3xl mx-auto px-6 md:px-12 mt-12 md:mt-20">
+
+        {/* Back Navigation */}
+        <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.2 }}
-          className="mb-16"
+          className="mb-12"
         >
-          <Link to={`/event/${eventId}`} className="flex items-center gap-3 text-stone-500 hover:text-white transition-all font-label uppercase text-[10px] tracking-[0.3em] group inline-flex">
+          <Link
+            to={`/event/${eventId}`}
+            className="flex items-center gap-3 text-stone-500 hover:text-white transition-all font-label uppercase text-[10px] tracking-[0.3em] group inline-flex"
+          >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
             <span>Back to {eventTitle}</span>
           </Link>
         </motion.div>
 
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-1000">
-          <div className="space-y-6">
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.4 }}
-              className="text-secondary font-label uppercase text-[12px] tracking-[0.5em] font-bold"
-            >
-              Expert Curator / Speaker
-            </motion.p>
-            <motion.h1 
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
-              className="font-headline text-5xl md:text-8xl font-light tracking-tighter leading-[0.9] text-white"
-            >
-              {speaker.name}
-            </motion.h1>
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
-              className="font-label uppercase text-stone-500 tracking-[0.2em] text-[14px] border-l-2 border-secondary/30 pl-6 py-2"
-            >
-              {speaker.role}
-            </motion.p>
-          </div>
+        {/* Identity Block */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+          className="mb-14 space-y-4"
+        >
+          <p className="text-secondary font-label uppercase text-[11px] tracking-[0.5em] font-bold">
+            Expert Curator / Speaker
+          </p>
+          <h1 className="font-headline text-5xl md:text-7xl font-light tracking-tighter leading-[0.9] text-white">
+            {speaker.name}
+          </h1>
+          <p className="font-label uppercase text-stone-500 tracking-[0.2em] text-[13px] border-l-2 border-secondary/30 pl-5 py-1">
+            {speaker.role}
+          </p>
+        </motion.div>
 
-          <motion.div 
+        {/* Animated Divider */}
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          transition={{ delay: 0.55, duration: 0.6 }}
+          className="origin-left h-[1px] bg-white/10 mb-14"
+        />
+
+        {/* Pull Quote — First 2 sentences, set large to avoid dense wall of text */}
+        {pullQuote && (
+          <motion.blockquote
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+            className="font-headline text-2xl md:text-3xl text-stone-200 font-light italic leading-snug mb-14 border-l-4 border-secondary/40 pl-8"
+          >
+            {pullQuote}
+          </motion.blockquote>
+        )}
+
+        {/* Body Paragraphs — Airy, one chunk per 2 sentences */}
+        {bodyParagraphs.length > 0 && (
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-            className="prose prose-invert prose-stone max-w-none"
+            transition={{ delay: 0.75 }}
+            className="space-y-8"
           >
-            <p className="font-body text-stone-300 text-lg md:text-xl italic leading-relaxed md:leading-[1.6]">
-              {speaker.bio}
-            </p>
+            {bodyParagraphs.map((para, i) => (
+              <p
+                key={i}
+                className="font-body text-stone-400 text-base md:text-lg font-light leading-[1.9] md:leading-[2]"
+              >
+                {para}
+              </p>
+            ))}
           </motion.div>
+        )}
 
-          <motion.div 
-             initial={{ opacity: 0 }}
-             animate={{ opacity: 1 }}
-             transition={{ delay: 1 }}
-             className="pt-12 border-t border-white/5 flex gap-8 items-center"
-          >
-             <span className="font-label uppercase tracking-widest text-[10px] text-stone-600">Digital Footprint</span>
-             <div className="flex gap-6">
-                <a href="#" className="text-stone-500 hover:text-white transition-colors"><Instagram className="w-4 h-4" /></a>
-                <a href="#" className="text-stone-500 hover:text-white transition-colors"><Linkedin className="w-4 h-4" /></a>
-                <a href="#" className="text-stone-500 hover:text-white transition-colors"><Globe className="w-4 h-4" /></a>
-             </div>
-          </motion.div>
-        </div>
+        {/* Digital Footprint */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="mt-20 pt-10 border-t border-white/5 flex gap-8 items-center"
+        >
+          <span className="font-label uppercase tracking-widest text-[10px] text-stone-600">Digital Footprint</span>
+          <div className="flex gap-6">
+            <a href="#" aria-label="Instagram" className="text-stone-500 hover:text-white transition-colors">
+              <Instagram className="w-4 h-4" />
+            </a>
+            <a href="#" aria-label="LinkedIn" className="text-stone-500 hover:text-white transition-colors">
+              <Linkedin className="w-4 h-4" />
+            </a>
+            <a href="#" aria-label="Website" className="text-stone-500 hover:text-white transition-colors">
+              <Globe className="w-4 h-4" />
+            </a>
+          </div>
+        </motion.div>
+
       </section>
     </div>
   );
