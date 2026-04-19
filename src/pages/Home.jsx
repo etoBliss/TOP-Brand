@@ -70,20 +70,20 @@ const Home = () => {
       <section className="bg-surface-container-low md:bg-surface-container-lowest py-24 md:py-32 px-6 md:px-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 border-t border-outline-variant/10 pt-24">
           <div className="space-y-2">
-            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">120+</h3>
+            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">80+</h3>
             <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Brands Refined</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">15k</h3>
+            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">200+</h3>
             <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Leaders Advised</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">09</h3>
-            <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Global Systems</p>
+            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">15+</h3>
+            <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Brands Directed</p>
           </div>
           <div className="space-y-2">
-            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">0.1</h3>
-            <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Execution Margin</p>
+            <h3 className="font-headline text-4xl text-secondary md:text-primary mb-2 italic font-black md:font-light">90%</h3>
+            <p className="font-label text-[9px] md:text-[10px] uppercase tracking-[0.2em] text-stone-500">Execution Efficiency</p>
           </div>
         </div>
       </section>
@@ -154,12 +154,12 @@ const Home = () => {
           </h2>
           <div className="grid grid-cols-2 md:flex md:gap-16 items-start">
             <div className="space-y-2">
-              <div className="text-secondary font-headline text-4xl font-black">12+</div>
+              <div className="text-secondary font-headline text-4xl font-black">4+</div>
               <div className="font-label text-[9px] uppercase tracking-widest text-stone-500">Years of Craft</div>
             </div>
             <div className="space-y-2">
-              <div className="text-secondary font-headline text-4xl font-black">84</div>
-              <div className="font-label text-[9px] uppercase tracking-widest text-stone-500">Global Systems</div>
+              <div className="text-secondary font-headline text-4xl font-black">500+</div>
+              <div className="font-label text-[9px] uppercase tracking-widest text-stone-500">Persons Reached</div>
             </div>
           </div>
          <div className="pt-8 md:pt-12">
